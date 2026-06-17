@@ -35,82 +35,115 @@ model = 'llama3.1:8b'
     # (questions might be more effective for the model to follow and answer, but statements might be more effective for the model to follow and identify the relevant information in the text input)
 
 #A dictionary of the different behaviours that we are analysing and providing as prompts for the model to use
-BEHAVIOUR_CATEGORY_RUBRIC = {
-    #INTENTIONALITY PROMPTS: intentionality of the agent's behaviour, including the presence of goals, plans, and motivations behind their actions.  Rank the intentionality on a scale from 10 (human) to 0 (generated)."
-    'INTENTIONALITY_PROMPTS' : ['Is there a presence of reason or motivation behind the agents actions and movements?', 
-                          'Does the agent exhibit goal-directed behavior?', #Does the behaviour build towards a larger goal? 
-                          'Does the goal fit the scenario context?', 
-                          'Are the agents actions coherent across time steps?', 
-                          'Does the agent show evidence of planning or foresight in their actions, any long-term goals?', 
-                          'Does the agent exhibit behavior that contributes towards short-term goals?',
-                          'Does the agent exhibit behavior that contributes towards long-term goals?'
-    ],   
 
+BEHAVIOUR_CATEGORY_RUBRIC = {
+#INTENTIONALITY PROMPTS: intentionality of the agent's behaviour, including the presence of goals, plans, and motivations behind their actions.  Rank the intentionality on a scale from 10 (human) to 0 (generated)."
+
+    'INTENTIONALITY_PROMPTS' : [
+        'Does the agent exhibit goal-directed behaviour?', #Does the behaviour build towards a larger goal? 
+        'Does the behaviour show a hierarchy of short and long term goals?',
+        'Do the inferred goals of the actions and tasks fit the scenario context?',
+        'Are the agents actions coherent across time steps and do they remain so over time?'],   
 
     #ADAPTABILITY PROMPTS: adaptability of the agent's behaviour. Dealing with uncertainty, ability to improv, re-plan or update plans as they happen.
-    'ADAPTABILITY_PROMPTS' : ['Does the agent show evidence of adapting their behavior in response to changes in the environment or unexpected events?',
-                        'Does the agent change its behaviour if it has previously already encountered a similar experience?',#Does the agent show evidence of learning from past experiences and applying that learning to new situations?
-                        'Does the agent show evidence of adjusting their behavior based on feedback from the environment or other agents?',
-                        'Does the agent show evidence of flexibility in their behavior, such as being able to switch between different strategies or approaches to achieve their goals?',
-                        'Does the agent show evidence of adjusting or modifying its behaviour as the context and situation changes?',
-                        'Does the agent show evidence of improvisation or creativity in their actions?', 
-                        'Does the agent show evidence of re-planning or updating their plans as they happen?',
-                        'Does the agent show evidence of updating goals when encountering new information or context?', #Real-time decision-making and goal updating
-    ],
+    'ADAPTABILITY_PROMPTS' : [
+		'Does the agent show evidence of adapting its behaviour when the environment or context changes?',
+        'Does the agent suggest the use of prior experience when encountering familiar situations?',
+        'Does the agent show evidence of adjusting its behaviour in response to external feedback?',
+        'Does the agent revise its goals when encountering unexpected events?'
+        'Does the agent show evidence of flexibility in their behaviour, such as being able to switch between different strategies or approaches to achieve their goals?',
+        'Does the agent show evidence of improvisation or creativity in their actions?',                 
+		'Does the agent show evidence of re-planning or updating their plans as they happen?'
+     ],
 
-
-    #ROUTINE AND VARIABILITY PROMPTS: routine and variability in the agent's behaviour. Testing for repetitive actions or patterns, as well as the ability for variability in their behaviour.
-    #Is there the appropriate proportion of both routine and variable behaviours present?
-    'ROUTINE_PROMPTS' : ['Does the agent show evidence of repetitive actions or patterns in their behavior, that might indicate routine behaviour?', # double check the wording of this one 
-                   #i.e. danger of this prompt is that it might be picking up on routine behaviour, which can be a sign of human and non-human behaviour.Reword this prompt to be more specify what kind of routine behaviour we are looking for.
-                   'Does the agent show competence in performing routine tasks?', 
-                    'Does the agents actions show familiarity and intrinsic knowledge of how to perform routine, daily tasks, or does it show evidence of learning how to perform routine tasks through trial and error?',
-                    'Does the agent show an ability to perform routine tasks with a degree of variability, such as being able to perform the same task in different action sequences or under different conditions?',
-                    'Does the agent exhibit variability in their behavior and does not show reliance on repetitive actions or patterns?',
-                    'Do any of the actions or sequence of actions seem like automated action?'
+    #ROUTINE AND VARIABILITY PROMPTS: 
+    'ROUTINE_PROMPTS' : ['Does the agent show evidence of habitual or routinely executed actions?',   
+                         'Does the agents behaviour show evidence of routine, automated actions and procedural familiarity with their tasks',                            
+                        'Does the agents suggest procedural familiarity with the task?',
+                        'If the agents actions are inferred as uncertain, does the agents behaviour suggest exploratory, investigative behaviour i.e. through trial and error?',
+                        'Does the agent show an ability to perform routine tasks with a degree of variability, if the task is repeated can the agent complete it using different action sequences?',
+                        'Do actions appear habitual or automatic rather than explicitly deliberative?'
+                        'Does the agents actions contain actions that verify the progress state of the action?'
     ],
 
     #IMPERFECTIONS, ERRORS, VARIABILITY
-    ##Does 'imperfect', 'perfect', 'hesitation', 'forgetting' etc need to be explicitely defined? i.e. how do you differentiate forgetting with distraction
-    'HUMAN_IMPERFECTIONS_PROMPTS' : ['Does the agent make any mistakes, undertake imperfect action?', #what classifies as a 'mistake'?
-                                 'Is there any deviation from the initial, desired task or is it a perfect exection of the inferred task?', # potential issue - the task could be inferred wrong, and then the execution wrongly determined as 'correct'
-                                 'Are there signs of hesisation in their carrying out of the task',#specific examples of deviation
-                                 'Does the agent show signs of forgetfulness in their action sequences?',
-                                 'Does the agent show signs of changing their minds or their initial course of action?',
-                                 'If the agent did perform mistakes, is there a range in their scale of mistakes?',
-                                 'Does the agent shows signs of getting realistically distracted from the inferred initial course of action?',
-                                 're there interruptions in behaviour and action flow (in contrast to a smooth flow)?'
+    'HUMAN_IMPERFECTIONS_PROMPTS' : [  
+        'Do the actions of the agent sh uncertainty, such as hesitation, action reversal or changes of course in their carrying out of the task?',
+        'Does the agent show signs of forgetfulness in their action sequences?',
+        'Does the agent shows signs of distraction from the current task?',
+        'Are there interruptions in behaviour and action flow, such as pauses between actions or interruptions in task flow (in contrast to a smooth flow)?'
     ],
+
+    #ERROR RECOVERY 
+    'RECOVERY_PROMPTS' : ['If actions of the agent are inferred as mistakes, do the mistakes and recovery appear overly direct or artificially convenient? The more true this is, the lower the score.',
+        'If the agent shows signs of mistakes, are the agents able to correct their path of action, or recover from a potential error?',
+        'Does the agent show evidence of being able to detect and recognise its own mistakes?',
+        'Does the behaviour show evidence of reviewing or self-checking between tasks and after mistakes?'
+    ],
+
 
     #EMOTIONS
-    'PRESENCE_OF_EMOTION_PROMPTS' : ['Does the agent demonstrate behaviour that is emotionally-charged?',#does the agent show behaviour that is not fully explainable, but rather due to feelings/ vibes?
-                                     'Does the agent show behaviour that is not purely rational?',
-                                     'Does the agent show behavioural choices that are not fully explainable?',
+    'EMOTIONAL_ACTION_PROMPTS' : [
+        'Does the agent show behaviour and actions that are not purely rational or utility-maximising?'
+    ],
+
+    #NON-OPTIMALITY 
+    'PREFERENCES_AND_NON_OPTIMAL_BEHAVIOUR' : [ #deviation from a clean task flow
+        'Does the agents behaviour suggest preference-driven choices over optimal actions?',
+        'Does the agent behaviour display sub-optimal behaviour?', 
+        'Does the agents behaviour show signs of settling for adequate rather than optimal action flows?',
+        'Does the agents behaviour show small variations in action sequences that can be inferred as routine behaviour?'
+    ],
     
+    #TIMING
+    'TIMING' : [
+        'Do the time intervals between different actions or task sequences performed show realistic variation? '
+        'Do action timings exhibit realistic variation  (in comparison to e.g. being evenly spaced out) i.e. the timing of the actions, time taken for each action and time between actions?',
+        'Do the times taken for each action correspond with the time generally required for the actions?',
+        'Are the times taken to perform tasks realistic rather than optimally efficient?'
     ],
 
-    'PREFERENCES_AND_NON_OPTIMAL_BEHAVIOUR' : ['Does the agents behaviour show proof of choosing preference over the rule-binding, optimal actions?',
-                                               'Does the agent behaviour display sub-optimal behavior?',
-                                               #'Does the agent have multiple competing goals?'
-                                               'Does the agent show any personal indivuality/ quirks that are not of a typical human?', #what defines a 'typical human'?  
-                                               'Does the agents behaviour show small variations in action sequences that can be inferred as routine behaviour?'
+    #MICRO-BEHAVIOUR
+    'MICRO-BEHAVIOUR' : [
+        'Does the agents behaviour perform any automatic, subconscious or micro-behaviours, behaviours with no outward goal? Some examples include yawning, stretching, fidgeting, sighing, flinching, startling, hiccups etc.',
     ],
 
-    'RECOVERY_PROMPTS' : ['If the agent shows behaviour that falls under mistakes, do the mistakes appear too curated?',
-                          'If the agent shows signs of mistakes, are the agents able to recorect their path of action, are they able to revover from a potential error?', #'relatively quickly'? how fast is quick - define if including feed as a prompt
-                          'If the agent shows behaviour suggestive of mistake, does the recovery from their mistake seen curated?'
+    #ENVIRONMENTAL CONTEXTUAL BEHAVIOUR
+    'ENVIRONMENTAL_CONTEXT_BEHAVIOUR' : [
+	    'Do the actions of the human adapt to the locations of the objects they are interacting with?',
+	    'Do the agents actions show an awareness of their environmental constraints, surrounding wise?', #i.e. physically, walking around obstacles, repositioning objects, adjusting grip, changing posture
+	    'Do the actions of the human show that they have been influenced by their surrounding environment?'
     ],
 
-    'TIMING' : ['Is there a realistic variation in the times between actions; is there enough variation in timing or is it too evenly spaced out?',
-                'Does the timing of the actions and time taken for each action show a realistic depiction of sporadicity?',
-                'Do the times taken for each action correspond with the time generally required for the actions?',
-                'Are the times taken to perform tasks optimised times or realistic?'
-    ],
-
-    'MICRO-BEHAVIOUR' : ['Does the agents behaviour perform any automatic, subconscious or micro-behaviours, behaviours with no outward goal? Some examples include yawning, stretching, fidgeting, sighing, flinching, startling, hiccups etc.',
+    #PHYSIOLOGICAL_CONTEXT
+    'PHYSIOLOGICAL_CONTEXT' : [
+	    'Do the agents actions show an awareness of and reflect realistic constraints of the body?',
+	    'Do the agents actions and behaviour seem physically plausible?'
+	],
+	
+    #ATTENTIVENESS
+    'ATTENTIVENESS' : [
+        'Does the agent exhibit actions that suggests it periodically monitor or reassess its environment?',
+	    'Does attention shift between multiple goals or objects?',
+	    'Does the agents behaviour suggest selective attention rather than perfect awareness of the environment?',
+	    'Does the agents behaviour show signs that some information is overlooked?'
+	],
+    
+    #FORESIGHT
+    'FORESIGHT' : [
+	    'Does the agent show signs of bundling related actions together when possible?',
+	    'Does the behaviour indicate towards an awareness of anticipating future resource needs, or evidence of planning/ foresight?',
+	    'Are multiple goals being pursued simultaneously?',
+	    'Are some goals temporarily postponed or left in favour of other goals?'
+	],
+	
+    #SOCIAL BEHAVIOUR
+    'SOCIAL_BEHAVIOUR': [
+        'If other agents or living beings are present, does the agents behaviour adapt to their actions?',
+        'If other agents are present, does the agent coordinate its actions with the others?',
+        'If other agents are present, does the agent show an adequate awareness of social expectations?'
     ]
-}
-                                
+}                              
 
 # function to send the prompt to the Ollama API and get the response
 def get_behavior_analysis(text_input, rubric): # can later incorporate a dimensions input where you can choose which dimensions you wish to analyse 
@@ -144,24 +177,35 @@ def get_behavior_analysis(text_input, rubric): # can later incorporate a dimensi
         #Modify the 'system' role to include specific instructions or examples for the behaviour of the discriminator to follow when analyzing the behaviour transcript.
         #Modify the 'user'role by appending the text input (the behaviour transcript) to the messages list. The text input should be a description of the agents actions 
         #and movements expected in natural language format.
-    system_prompt = "You are a behavior discriminator, recognising patterns in agent behaviour and ranking them on a scale from 10 (human) to 0 (generated)."
-    user_prompt = f"""Analyse the following behaviour transcript, using the provided rubric and steps outlined below. 
+    
+    system_prompt = "You are a behavior discriminator, with the task of analysing behaviour in a inputted behavioural transcript using a provided behaviour rubric, and scoring how human-like the agents actions are on a scale from 0 to 10, where 0=generated-like and 10=clearly human-like."
+    
+    user_prompt = f"""Analyse the following behaviour transcript, using steps outlined below and the provided rubric. 
 
-                First, if not already in a transcript format, literally and precisely convert the transcript into a behavioural action log. 
-                Record each seperate action taken and the timestep at which each action occurs.
+                Step 1: 
+                - If text_input is not already in a behavioural action-log format, literally and precisely convert it into a behavioural action log. 
+                - Record each seperate observable action taken and the timestep at which actions occur.
+                - Only include actions explicitly present in the transcript
+                - Do not invent, assume or ass actions that are not recorded
 
-                Secondly, use the following prompts for each category in the behaviour rubric, using the behavioural action log: 
-                - answer and provide a score between 0 (completely generated) to 10 (human behaviour) for each question in this category
-                - provide clear evidence from the transcript as to why this score was given for this category
-                - calculate and return the average of all the scores within the category 
-                - If the average category score is above 6, classify it as a human input. Else, if category average is under 6 then classify it as generated input
-                        
-                Only consider actions that have been literally recorded in the transcript, and do not make up new actions. If a behaviour is not present, score it accordingly. 
-                Third, combine and find the average of all overall category scores for an overall human-likeness percentage. 
-                If the overall percentage is less than 60%, classify the input as generated  
-                If the overall percentage is greater than 60%, classify the input as human 
+                Step 2: For each category in the behavioural rubric:
+                -Answer each question in the category applied to the behavioural action log 
+                -Give each question a score between 0 to 10, where 0= strongly generated-like, 5=ambiguous, and 10= strongly human-like 
+                -If a question has insufficient evidence, assign a score of 5
+                -If the category is 'social_behaviour', only consider if there is a presence of another agent. Else give a a human-likeness scoring of 5.
+                -Provide clear evidence from the transcript for why the score was given, including categories scored with insufficient evidence  
+                -Calculate the average of the scores in the category
+                -Classify the category as 'human-like' if the category average >= 7
+                -Classify the category as 'generated-like' if the category average <7
 
-                Output the categories, grouped into two: categories scoring agent-like and the categories scoring human-like
+                Step 3: 
+                - Calculate the overall human-likeness score for the behavioural action log by finding the average of average scores of all the categories.
+                - Multiply the overall human-likeness score of the 10 for a human-likeness percentage
+                - Classify the inputed text as 'human' if the overall human-likeness percentage >=70
+                - Classify the inputted text as 'generated' if the overall human-likeness percentage <70
+
+                Step 4:
+                -Grouped the categories by their classification, into human-like categories and generated-like categories.
 
                 Behaviour transcript: 
                 {text_input}
@@ -169,15 +213,22 @@ def get_behavior_analysis(text_input, rubric): # can later incorporate a dimensi
                 behaviour rubric: 
                 {rubric}
 
-                Return JSON:
-                {{'overall_human_score': 0, 
-                'classification': '',
-                   'summary': '',
-                   'categories': [ {{
-                        'category': '',
-                        'average_score': 0,
-                        'human_or_generated_label': '',
-                        'label_evidence_reasoning': ''
+                Return valid JSON only:
+                For "categories", return an entry for each category in the behavioural rubric. Do not skip or omit any category even if no evidence is available.
+                {{"overall_human_likeness_percentage": 0, 
+                "classification": "",
+                "summary": "",
+                "behavioural_action_log" : [{{
+                    "timestep": "",
+                    "action": ""
+                   }}],
+                "human_like_categories" : ""
+                "generated_like_categories": "",
+                "categories": [ {{
+                    "category": "",
+                    "average_score": 0,
+                    "human_or_generated_label": "",
+                    "label_evidence_reasoning": ""
                     }} ] }}
     """
 
@@ -186,16 +237,154 @@ def get_behavior_analysis(text_input, rubric): # can later incorporate a dimensi
     return json.loads(response['response'])
 
 #------------------------------------------------------------------------------------
-#TEST TRANSCRIPT:
+#TEXT INPUT: CHANGE ANY GIVEN TEXT INPUT INTO A BEHAVIOURAL TRANSCRIPT 
+
+def text_to_action_log (text_input):
+
+    '''
+    Timing is depedent on the input: 
+        If timing is provided alongside the text input, return an action log alongside the times at which they occurred. 
+        Else, create an action log without a corresponding time record. (Can later analyse with all behaviour categories in rubric other than time.
+            In this case, the timing recorded will be qualitative; if there are cues towards duration of actions or relative action times
+    '''
+    prompt = f"""Convert the following text input into a structured action log, recording each individual action seperately.
+        
+        If text input has explicit timestamps, for each action give its step in the sequence, its timestamp and short description of the action.
+        Only include actions that appear in the text.
+    
+        If text input does not have explicit timestamps but does have time cues or duration cues for an action, give its steps in the sequence, the action, the time/ duration cue mentioned in the text, and a short description of the action
+
+        If text input does not have any timestamps or time cues or duration cues, give its step in the sequence and a short description of the action.
+        
+        Only include and analyse what is literally given in the text input, do not make up or invent times, and leave the 'time_stamp / time_cue" response empty.
+        Text input: {text_input}
+
+        Return JSON: {{
+            "action log" : [ {{
+                "step": 0,
+                "time stamp / time_cue": "",
+                "action": ""
+                }} ]
+            }}""" 
+
+    # Send the prompt to the Ollama API
+    response = client.generate(model=model, prompt= prompt, format= 'json', options={'temperature': 0}) #temperature keeps the results reproducible  
+    return json.loads(response['response'])['action_log']
+
+#------------------------------------------------------------------------------------
+#VIDEO INPUT: CHANGE ANY GIVEN VIDEO INPUT INTO A BEHAVIOURAL TRANSCRIPT / ACTION LOG 
+#extracts frames from video input and audio as a transcript
+
+vision_model = "qwen2.5-VL"
+
+video_file_path = "" #insert path to the video to be analysed here
+frames_directory = "frames" 
+frame_interval = 30 #1 frame every 30 frames (~1 second if 30fps) #what does fps mean!
+video_transcript_file = "video_transcript.txt"
+
+#FOR VISION MODEL QWEN2.3VL:7B 
+## REFERENCE WEBSITE: https://pyimagesearch.com/2025/06/16/video-understanding-and-grounding-with-qwen-2-5/
+
+#Import classes and functions from required libraries 
+from transformers import Qwen2_5_VLForConditionalGeneration, AutoTokenizer, AutoProcessor
+from qwen_vl_utils import process_vision_info 
+
+#call/ instantiate model
+vision_model_qwen = Qwen2_5_VLForConditionalGeneration.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct", torch_dtype="auto", device_map="auto")
+
+#FOR THE PROCESSOR: WHY DO YOU NEED THE MIN/MAX PIXEL VALUES?
+processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct", min_pixels=min_pixels, max_pixels=max_pixels)
+
+#sample and visualise frames within the video 
+from IPython.display import Markdown, display 
+import numpy as np
+from PIL import image 
+
+
+#Below code is not required - only for debugging 
+# import decord 
+# from decord import VideoReader, cpu
+# def get_video_frames (video_file_path, frame_interval = frame_interval):
+#     '''
+#     INPUTS:
+#         video_file_path - the file path to the video input 
+#         frame_interval - the number of frames between each frame 
+
+#     OUTPUTS: a JSON of frame timestamps and a short description of the action in each time stamp
+#         frames 
+#         timestamps 
+#     FUNCTION:
+#         Extract evenly spaced frames and timestamps from a video file 
+#     '''
+
+#     vr = VideoReader (video_file_path, ctx=cpu(0))
+#     total_frames = len(vr)
+#     num_frames = total_frames / frame_interval 
+#     indices = np.linspace(0, total_frames -1, num=num_frames, dtype=int)
+#     frames = vr.get_batch(indices).asnumpy()
+#     timestamps = np.array([vr.get_frame_timestamp(idx) for idx in indices])
+
+#     return frames, timestamps 
+    
+#inference of the video frames function 
+#WHAT DO THE INPUTS MEAN ?
+def video_inference (vision_model, processor, video_path, max_new_tokens=1024, total_pixels=20480*28*28, min_pixels=16*28*28):
+    
+    user_prompt = f"""Localize a series of activity events in the video, output the start and end timestamp for each event, and describe each 
+        event with sentences. Provide the result in json format with 'seconds' format for time depiction."""
+    
+    messages =[
+        {"role": "system",
+         "content": "Your role is to create an action log for the provided video input, stating the time-step / frame-step and the a short description of the action being taken in each frame"
+         },
+        #WHAT DOES EACH LINE OF THIS MEAN? 
+        {"role": "user",
+         "content": [
+             {"type": "text", "text": user_prompt},
+             {"video": video_path, "total_pixels": total_pixels, "min_pixels": min_pixels}
+
+         ]}]
+    
+    #Prep for inference: 
+    #process_vision_info extracts image and video inputs and frame rate information 
+    image_inputs, video_inputs, video_kwargs = process_vision_info([messages], return_video_kwargs = True)
+    fps_inputs = video_kwargs ['fps']
+
+    #combine text, images and video data into tensors, transfer to GPU  
+    inputs = processor( text= [user_prompt], images = image_inputs, videos = video_inputs, fps = fps_inputs, padding = True, return_tensores='pt')
+    inputs = input.to('cuda')
+
+    #UNDERSTAND WHAT THESE INDIVIDUAL LINES DO! 
+    #Generate model outputs and extract new tokens beyond initial input length
+    output_ids = vision_model.generate(**inputs, max_new_tokens = max_new_tokens)
+    generated_ids = [output_ids[len(input_ids):] for input_ids, output_ids in zip(inputs.input_ids, output_ids)]
+    #decode tokens into human-readable text
+    output_text = processor.batch_decode(generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+    return output_text[0]
+
+#calling the vision model 
+## video_inference_action_log = video_inference(vision_model, processor, video_file_path, prompt)
+## display(Markdown(video_inference_action_log))
+
+#------------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------------
+#COMBINE ABOVE TO CREATE A PIPELINE 
+
+#get action log -> input into discriminator (include into discriminator option to make time category optional based on input)
+
+#------------------------------------------------------------------------------------
+
+#TESTING THE CODE:
 
 import pandas as pd
 from pathlib import Path
 
-csv_path = Path(__file__).with_name("EPIC_100_validation_dataset.csv")
+#csv_path = Path(__file__).with_name("EPIC_100_validation_dataset.csv")
 
-df = pd.read_csv(csv_path, usecols=['start_timestamp', 'stop_timestamp', 'narration'])
+#df = pd.read_csv(csv_path, usecols=['start_timestamp', 'stop_timestamp', 'narration'])
 
-print (df)
+#print (df)
 
 if __name__ == "__main__":
     test_transcript_1 = """
@@ -237,7 +426,82 @@ if __name__ == "__main__":
 #print (get_behaviour_analysis (text_input))
 
 #-------------------------------------------------------------
- #Print response
-##print ('Analysis output:')
-##print (response.response)
+
+#The llama vision model code
+
+#extract frames - for vision_model llama3.2
+# def extract_video_frames (video_path, output_dir, interval=frame_interval):
+#     """
+#     Input: 
+#     video_path : the variable defining the path to the input videp 
+#     output_dir : the output file/ directory to which you want the frames to be outputted to 
+#     interval : the time interval between each frame (determined by the number of frames between each recorded frame)
     
+#     Output: 
+    
+
+#     Function: Open the video and reads the video by frame.
+#     The frame read are frames at each defined frame_interval
+#     Provides input for the vision model to then process the images/ the frames
+#     """   
+
+#     os.makedirs(output_dir, exist_ok=True)
+#     cap = cv2.VideoCapture(video_path)
+#     frame_count, saved = 0,0 
+#     while True: 
+#         ret, frame = cap.read()
+#         if not ret: 
+#             break 
+#             if frame_count % interval == 0:
+#                 frame_path = os.path.join(output_dir, f"frame_{saved:03d}.jpg")
+#                 cv2.imwrite(frame_path, frame)
+#                 saved += 1
+#             frame_count += 1
+#         cap.release()
+#         print (f"'Extracted' {saved} frames to '{output_dir}')
+
+#to meet ollama requirements: encode images (inside a JSON payload) to base64
+# #WHAT IS BASE64? 
+# def encode_image_to_base64(image_path):
+#     with open(image_path, "rb") asw img:
+#         return base64.b64encode(img.read()).decode("utf-8")
+
+# #transcribe any audio from input video 
+# def transcribe_video(video_path, output_file):
+#     """
+#     Function:
+#     Transcribing audio from video. Using whisper.
+    
+#     Input:
+#     video_path: The path to the video file to be analysed
+#     output_file: The file to output the transcription to 
+
+#     Output:
+#     file with the transcription from the audio
+#     """
+#     model = whisper.load_model("small")
+#     result = model.transcribe(video_path)
+#     text = result["text"]
+#     with open(output_file, "w", encoding = "utf-8") as f: #WHAT DO THESE VARIABLES MEANNNN
+#         f.write(text)
+#     print (f"transcription saved to '{output_file}'")
+#     return text 
+
+# def video_discriminator (prompt, frames_dir, transcript_file):
+#     frames = sorted ([f for f in os.listdir(frames_dir) if f.endwith("jpg")])
+    
+#     frame_path = os.path.join(frames_dir, frames[0])
+#     image_b64 = encode_image_to_base64(frame_path)
+
+#     with open(transcript_file, "r", encoding="utf-8") as f:
+#         transcript = f.read()
+#     #want an output that shows 
+#     input_for_model = {
+#         "model": vision_model,
+#         "messages": [
+#             {
+#             "role": "user",
+
+#             }
+#         ]
+#     }
