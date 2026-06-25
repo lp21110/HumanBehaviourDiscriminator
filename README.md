@@ -23,8 +23,6 @@ The following are the behavioural dimensions covered in the pre-defined rubric a
   EMOTIONS  
   TIMING  
 
-%why each behaviour is chosen 
-
 ## Usage requirements/ Dependencies:
 LLM: Ollama  
 Ollama model: qwen3.5:9b
