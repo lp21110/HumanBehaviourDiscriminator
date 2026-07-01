@@ -109,8 +109,8 @@ def get_behaviour_analysis(text_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC, user_di
 
 
     #now find the average of the average scores and classify an overall human-likeness score for the given text
-    overall_average_score = (sum(category['average_score_of_category'] for category in categories))  / len(categories)
-    overall_human_likeness_percentage = (overall_average_score / (len(categories) * 10)) * 100 #calculate the overall human-likeness percentage for all the categories considered
+    overall_average_score = (sum(category['average_score_of_category'] for category in categories))  / (len(categories)*10)
+    overall_human_likeness_percentage = (overall_average_score * 100) #calculate the overall human-likeness percentage for all the categories considered
 
     #calculate overall human-likeness classification based on average score
     if overall_human_likeness_percentage >= 70:
@@ -123,8 +123,14 @@ def get_behaviour_analysis(text_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC, user_di
     user_prompt_2_summary = f"""Using the categories in the list 'categories', return a summary for the overall human-likeness score, including reasoning 
         and evidence for the score given. Only consider the scored categories in the list 'categories'. 
     
+        overall human-likeness percentage:
+        {overall_human_likeness_percentage}
+        
+        categories: 
+        {json.dumps(categories, indent=2)}
+
         Return valid JSON only: 
-            {'summary': ''} 
+        {{'summary': ""}}
 
     """
 
@@ -132,7 +138,7 @@ def get_behaviour_analysis(text_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC, user_di
     response_2_summary = init_response_2_summary["response"]
 
     parsed_response_2_summary = json.loads(response_2_summary) #LLM response for summary of score reasoning is parsed into dictionary format for further processing.
-
+    final_output_summary = parsed_response_2_summary.get("summary", "" )
     #group all the results together for complete final analysis
     final_analysis = {
         "overall_human_likeness_percentage": overall_human_likeness_percentage,

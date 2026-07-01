@@ -232,4 +232,4 @@ demo = build_app()
 
 
 if __name__ == "__main__":
-    demo.queue(default_concurrency_limit=1).launch(show_error=True, share=True).\
+    demo.queue(default_concurrency_limit=1).launch(show_error=True, share=True)
