@@ -56,7 +56,8 @@ BEHAVIOUR_CATEGORY_RUBRIC = {
     ],
 
     #ERROR RECOVERY 
-    'RECOVERY' : ['If actions of the agent are inferred as mistakes, do the mistakes and recovery appear overly direct or artificially convenient? The more true this is, the lower the score.',
+    'RECOVERY' : [
+        'If actions of the agent are inferred as mistakes, do the mistakes and recovery appear overly direct or artificially convenient? The more true this is, the lower the score.',
         'If the agent shows signs of mistakes, are the agents able to correct their path of action, or recover from a potential error?',
         'Does the agent show evidence of being able to detect and recognise its own mistakes?',
         'Does the behaviour show evidence of reviewing or self-checking between tasks and after mistakes?'
@@ -85,7 +86,7 @@ BEHAVIOUR_CATEGORY_RUBRIC = {
     #     'Are the times taken to perform tasks realistic rather than optimally efficient?'
     # ],
 
-    #MICRO-BEHAVIOUR
+    #MICRO- remove
     'MICRO-BEHAVIOUR' : [
         'Does the agents behaviour perform any automatic, subconscious or micro-behaviours, behaviours with no outward goal? These are behaviours such as yawning, stretching, fidgeting, sighing, flinching, startling, hiccups etc.',
     ],
@@ -389,6 +390,8 @@ def get_behaviour_analysis(text_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC, user_di
         #Modify the 'user'role by appending the text input (the behaviour transcript) to the messages list. The text input should be a description of the agents actions 
         #and movements expected in natural language format.
 
+        #Seperate steps 1 and 2 call
+
     system_prompt = "You are a behaviour discriminator. Your role is to analyse behaviour using a provided behaviour rubric, and score how human-like the agents actions are on a scale from 0 to 10, where 0=generated-like and 10=clearly human-like."
     
     user_prompt = f"""Analyse the following behaviour input, using steps outlined below and the provided rubric. 
@@ -439,7 +442,7 @@ def get_behaviour_analysis(text_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC, user_di
 
     # Send the prompt to the Ollama API
     #if using 'qwen' model, include the variable 'think' (, think = False ). Else remove 
-    init_response = client.generate(model=model, system = system_prompt, prompt= user_prompt, format= "json",think=False, options={"temperature": 0}) #temperature keeps the results reproducible  
+    init_response = client.generate(model=model, system = system_prompt, prompt= user_prompt, format= "json", think=False, options={"temperature": 0}) #temperature keeps the results reproducible  
     response = init_response["response"]
 
     parsed_response = json.loads(response)
@@ -454,7 +457,7 @@ def get_behaviour_analysis(text_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC, user_di
 #USE INPUTTED BEHAVIOUR DIMENSIONS AS USER_DIMENSION_REPLY INPUT 
 
 
-
+###Put this into __init__.py file 
 def get_behavioural_analysis_interactive (rubric=BEHAVIOUR_CATEGORY_RUBRIC):
     user_input_text_reply = ask_for_text_input()
     user_dimensions_REPLY = ask_for_behaviour_dimensions(rubric)
@@ -464,6 +467,7 @@ def get_behavioural_analysis_interactive (rubric=BEHAVIOUR_CATEGORY_RUBRIC):
 
 
 ####
+
 
 
 result_interactive_input = get_behavioural_analysis_interactive(rubric=BEHAVIOUR_CATEGORY_RUBRIC)
@@ -500,7 +504,7 @@ if __name__ == "__main__": #only runs if this script is directly run instead of 
     # result_1 = get_behaviour_analysis(text_input=test_transcript_1, user_dimension_reply="ALL_PROMPTS", rubric=BEHAVIOUR_CATEGORY_RUBRIC)
     # print('RESULT 1', json.dumps(result_1, indent=2))   # pretty-print if it parsed to a dict
 
-    # test_transcript_2 = """
+    #test_transcript_2 = """
     # [07:42:13] Agent walks into kitchen, flicks light switch, light doesn't come on, flicks it again.
     # [07:42:20] Agent fills kettle, slightly overfills, tips a bit back out into sink.
     # [07:42:34] Agent sets kettle to boil, leans against counter.
