@@ -1,14 +1,14 @@
 BEHAVIOUR_DIMENSION_SUMMARIES = {
-    'ADAPTABILITY_PROMPTS': 'Assesses whether behaviour changes with context, feedback, obstacles, prior experience, or revised plans.',
-    'HUMAN_IMPERFECTIONS_PROMPTS': 'Assesses hesitation, forgetfulness, distraction, interruptions, and other imperfect human-like action flow.',
-    'RECOVERY_PROMPTS': 'Assesses mistake detection, correction, self-checking, and whether recovery looks natural or overly convenient.',
-    'PREFERENCES_AND_NON_OPTIMAL_BEHAVIOUR': 'Assesses preference-driven choices, adequate rather than optimal actions, and small routine variations.',
+    'ADAPTABILITY': 'Assesses whether behaviour changes with context, feedback, obstacles, prior experience, or revised plans.',
+    'HUMAN_IMPERFECTIONS': 'Assesses hesitation, forgetfulness, distraction, interruptions, and other imperfect human-like action flow.',
+    'RECOVERY': 'Assesses mistake detection, correction, self-checking, and whether recovery looks natural or overly convenient.',
+    'PREFERENCES_AND_NON_OPTIMALITY': 'Assesses preference-driven choices, adequate rather than optimal actions, and small routine variations.',
     'MICRO-BEHAVIOUR': 'Assesses automatic or subconscious behaviours with no outward task goal, such as fidgeting or yawning.',
-    'ENVIRONMENTAL_CONTEXT_BEHAVIOUR': 'Assesses whether actions respond to objects, surroundings, and environmental constraints.',
+    'ENVIRONMENTAL_CONTEXT': 'Assesses whether actions respond to objects, surroundings, and environmental constraints.',
     'PHYSIOLOGICAL_CONTEXT': 'Assesses whether actions are physically plausible and reflect realistic bodily constraints.',
     'ATTENTIVENESS': 'Assesses monitoring, attention shifts, selective awareness, and whether some information is overlooked.',
     'FORESIGHT': 'Assesses planning ahead, bundling related actions, postponing goals, and managing multiple goals.',
-    'SOCIAL_BEHAVIOUR': 'Assesses adaptation, coordination, and awareness when other agents or living beings are present.'
+    'SOCIAL': 'Assesses adaptation, coordination, and awareness when other agents or living beings are present.'
 }
 
 
