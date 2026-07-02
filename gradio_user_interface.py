@@ -161,8 +161,7 @@ def build_app():
     with gr.Blocks(title="Human Behaviour Discriminator") as app:
         gr.Markdown(
             "# Human Behaviour Discriminator\n"
-            "Enter an action description, choose the dimensions to assess, and run "
-            "the complete Ollama-backed analysis pipeline.")
+            "Enter an action description, choose the dimensions to assess, and press Run Analysis for results.")
 
         with gr.Row():
             with gr.Column(scale=3):
