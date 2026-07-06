@@ -1,9 +1,7 @@
-import json
-
-from .ollama_config import client, model 
+from .model_provider import get_model_provider
 
 ###IMPROVEMENT: INCLUDE 'CLIENT' AS A VARIABLE IN THE FUNCTION SO THAT IT CAN BE SWITCHDE OUT WITH VARYING MODELS 
-def text_to_action_log (text_input):
+def text_to_action_log(text_input):
 
     '''
     Timing is depedent on the input: 
@@ -24,15 +22,25 @@ def text_to_action_log (text_input):
         Text input: {text_input}
 
         
-        Return JSON: {{
+        Return JSON using these keys: {{
             "action_log" : [ {{
-                "step": 0,
+                "step": 1,
+                "time stamp":"",
+                "time_cue":"",
                 "action": ""
                 }} ]
             }}""" 
     
-    response = client.generate(model=model, prompt=prompt, format='json', think=False, options={'temperature':0})
-    return json.loads(response['response'])['action_log']
-    #response_text = response['response'].strip()
-    #parsed_response = json.loads(response_text)
-    #return parsed_response['action_log']
+    model_provider = get_model_provider()
+    response = model_provider.generate_json(
+        system_prompt=(
+            "You convert behaviour descriptions into structured action logs. "
+            "Return only the requested JSON object."
+        ),
+        user_prompt=prompt,
+    )
+
+    if "action_log" not in response or not isinstance(response["action_log"], list):
+        raise ValueError("The model response did not contain an action_log list.")
+
+    return response["action_log"]

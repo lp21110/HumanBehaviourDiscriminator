@@ -56,4 +56,4 @@ def ask_for_text_input():
     '''
     user_reply = input('\nEnter your text input to be analysed (enter as one line): ')
     action_log = text_to_action_log(user_reply)
-    return action_log 
+    return action_log
