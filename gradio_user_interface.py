@@ -1,11 +1,10 @@
-import json
-
 import gradio as gr
 
 from human_behaviour_discriminator.behaviour_rubric import (BEHAVIOUR_CATEGORY_RUBRIC, BEHAVIOUR_DIMENSION_SUMMARIES,)
 from human_behaviour_discriminator.get_behaviour_analysis import (
     get_behaviour_analysis,)
 from human_behaviour_discriminator.text_to_actionlog import text_to_action_log
+from human_behaviour_discriminator.model_provider import ModelProviderError
 
 
 DIMENSION_NAMES = list(BEHAVIOUR_CATEGORY_RUBRIC)
@@ -110,16 +109,15 @@ def analyse_behaviour(behaviour_text, selected_dimensions, custom_prompt, progre
     progress(0.1, desc="Converting the text into an action log") #dsiplays on screen current step of converting input text to an action log 
     try:
         action_log = text_to_action_log(behaviour_text)
-    except json.JSONDecodeError as exc: #debugging error message for if the transcript canonot be converted to a json action log format 
+    except ModelProviderError as exc:
         raise gr.Error(
-            "Ollama returned invalid JSON while creating the action log. "
-            "Please retry the request."
+            f"The configured model provider could not create the action log: {exc}"
         ) from exc
     
     except Exception as exc: #if there are issues other than json formatting that are preventing the input from being converted to an action log
         raise gr.Error(
-            f"Could not create the action log. Check that Ollama and the configured "
-            f"model are running. Details: {exc}"
+            f"Could not create the action log. Check the configured model provider. "
+            f"Details: {exc}"
         ) from exc
 
     progress(0.45, desc="Scoring the selected behaviour dimensions") #displays on screen current stage of scoring the dimensions - call get_behaviour_analysis
@@ -129,14 +127,13 @@ def analyse_behaviour(behaviour_text, selected_dimensions, custom_prompt, progre
             rubric=rubric,
             dimensions_of_interest=dimensions_of_interest,
         )
-    except json.JSONDecodeError as exc: #error message
+    except ModelProviderError as exc:
         raise gr.Error(
-            "Ollama returned incomplete or invalid analysis JSON. Retry the request "
-            "or select fewer dimensions."
+            f"The configured model provider could not complete the analysis: {exc}"
         ) from exc
     except Exception as exc: #error message 
         raise gr.Error(
-            f"The behaviour analysis failed. Check the Ollama server and model. "
+            f"The behaviour analysis failed. Check the configured model provider. "
             f"Details: {exc}"
         ) from exc
 
