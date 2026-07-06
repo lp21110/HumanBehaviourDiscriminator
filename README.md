@@ -17,49 +17,49 @@ The following are the behavioural dimensions covered in the pre-defined rubric a
  > - **FORESIGHT**: Assesses planning ahead, ability to bundle related actions (i.e. taking multiple items out the drawer at the same time for varying tasks), postponing goals, and managing multiple goals.  
  > - **SOCIAL**: Assesses adaptation, coordination, and awareness when other agents or living beings are present.  
 
-  Other dimensions considered include:  
-  INTENTIONALITY    
-  ROUTINE  
-  EMOTIONS  
-  TIMING  
+  Other dimensions considered include: INTENTIONALITY, ROUTINE, EMOTIONS, TIMING  
 
 ## Usage requirements/ Dependencies:
+
+**For Ollama Model (default)**  
 LLM: Ollama  
 Ollama model: qwen3.5:9b
 
+**For Private API**  
+LLM: OpenAI (from openai import OpenAI)  
+OpenAI model: jetson/qwen3.5-9b-q8_0
+
 ## How to use:
 
-### If running directly through python:
-The relevant function to call is:
-> ` get_behvaiour_analysis (text_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC, user_dimension_reply = None, dimensions_of_interest = None) `
+### Through terminal:
 
-where  
-- *text_input* is the desired text to analyse behaviour for. Pre-define in script before calling.  
-- *dimensions_of_interest* is a list of the specific dimensions to analyse text on if the user does not want all the dimensions scored. Pre-define in script before calling 
+**For Ollama (default):**  
+1. Call the user interface.  
+`py .\gradio_user_interface.py`
 
-example code:  
-    ` result = get_behavior_analysis(text_input=test_transcript_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC) #this will result with analysing the test_transcript_input with all the dimensions in the rubric  
-    print('RESULT 1', json.dumps(result_1, indent=2)) `
 
-### If running through terminal:
-The relevant function to call is:
-> ` get_behavioural_analysis_interactive(rubric=BEHAVIOUR_CATEGORY_RUBRIC) `
+**For Private API:**  
+1. Set the environment variable 'HBD_MODEL_PROVIDER' to "private_api". This variable selects from where to call the large language model.
+2. Assign the environement variable 'HDB_API_KEY' your API key.  
+`$env:HBD_MODEL_PROVIDER="private_api"`    
+`$env:HBD_API_KEY="yourAPIkey"`  
 
-This will:
-1. Prompt user to input their text to be analysed. Enter the text as one line.
-2. Prompt user to choose which behavioural dimensions they wish to analyse. User can reply using one of the following formats:
-   
-#### Prompt Options:
-- **ALL_PROMPTS** - Evaluates the text input containing behaviour to be analysed on all the dimensions defined in the behavioural rubric   
-- **'PROVIDED_PROMPTS'**: ... - Evaluates the text input on only the selected behavioural dimensions from the rubric. Selected and defined by the user  
-- **'OWN_PROMPT'**: ... - Evaluates the text input on a prompt given by the user, not from the pre-defined behavioural rubric  
-  or  
-- **'PROVIDED PROMPTS': ...; 'OWN_PROMPT'...** - Evaluate the text input on both selected behavioural dimensions from the rubric, as well as user-specific prompts   
+3. To call a model other than the default model from the private API, set the environment variable 'HBD_API_MODEL' to either of the below.    
+`$env:HBD_API_MODEL="jetson/qwen3.5-27b"`  
+OR  
+`$env:HBD_API_MODEL="jetson/qwen3.5-35b"`
 
-Any prompts entered that do not follow the above will return as Error
+This outputs a link to access either a local or online host to the (gradio) discriminator user interface.  
 
-3. Returns the behavioural analysis of the text input.
+## Using the Interface
 
-example code:  
-    `result_interactive_input = get_behavioural_analysis_interactive(rubric=BEHAVIOUR_CATEGORY_RUBRIC)
-     print('RESULT - INTERACTIVE USER INPUT', json.dumps(result_interactive_input, indent=2)) `
+**The User inputs:**  
+- The text to analyse  
+- Select the behavioural categories from the defined rubric to analyse text for
+- Can input their own prompt to analyse the text for. 
+
+**The User can see the following output:**  
+- Overall human-likeness percentage for chosen categories  
+- Classification  
+- Classification reasoning summary  
+- The individual behavioural categories analysed, their independent scores and score reasoning  
