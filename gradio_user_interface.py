@@ -5,20 +5,22 @@ from human_behaviour_discriminator.get_behaviour_analysis import (
     get_behaviour_analysis,)
 from human_behaviour_discriminator.text_to_actionlog import text_to_action_log
 from human_behaviour_discriminator.model_provider import ModelProviderError
+from human_behaviour_discriminator.chunked_analysis import analyse_large_behaviour_text
 
 
-DIMENSION_NAMES = list(BEHAVIOUR_CATEGORY_RUBRIC)
+DIMENSION_NAMES = list(BEHAVIOUR_CATEGORY_RUBRIC) #the default rubric to use for analysis
+CHUNKING_THRESHOLD_CHARS = 16_000 #the character limit for when to chunk the input 
 
-DIMENSION_CHOICES = [
+DIMENSION_CHOICES = [ #access the prompts for the behavioural dimensions the user wants to analyse from the behavioural rubric 
     (
         f"{name} — {BEHAVIOUR_DIMENSION_SUMMARIES.get(name, 'Behaviour rubric category')}",
         name,
     )
-    for name in DIMENSION_NAMES
-]
+    for name in DIMENSION_NAMES 
+] 
 
 
-def _selected_rubric(selected_dimensions, custom_prompt):
+def _selected_rubric(selected_dimensions, custom_prompt): #identify the selected dimensions for the analysis
 
     """Build the rubric selected in the Gradio form.
     
@@ -42,7 +44,7 @@ def _selected_rubric(selected_dimensions, custom_prompt):
     dimensions_of_interest = selected_dimensions.copy()
 
     custom_prompt = (custom_prompt or "").strip() #remove trailing and whitspace/ uneccesary characters from custom prompt by user
-    if custom_prompt: #append the 'custom_prompt to the rubric of 'dimensions_of_interest
+    if custom_prompt: #append the 'custom_prompt' of the user to the rubric of 'dimensions_of_interest
         rubric["OWN_PROMPT"] = [custom_prompt]
         dimensions_of_interest.append("OWN_PROMPT")
 
@@ -101,15 +103,20 @@ def analyse_behaviour(behaviour_text, selected_dimensions, custom_prompt, progre
     if not behaviour_text: #Return error message on screen if the user has not entered a input behavioural transcript to be analysed
         raise gr.Error("Enter behaviour text before running the analysis.") 
 
-    try:
+    try: #identify the dimensions and the relevant prompts for each dimension 
         dimensions_of_interest, rubric = _selected_rubric(selected_dimensions, custom_prompt) 
     except ValueError as exc: #convert error into an error pop-up 
         raise gr.Error(str(exc)) from exc #uses the original error message to explain Error raised
 
     progress(0.1, desc="Converting the text into an action log") #dsiplays on screen current step of converting input text to an action log 
     try:
-        action_log = text_to_action_log(behaviour_text)
-    except ModelProviderError as exc:
+        if len(behaviour_text) > CHUNKING_THRESHOLD_CHARS: #if the input behaviour length exceeds chunking threshold, chunk the text so the analysis can run.
+            progress(0.1, desc="Converting the large text into chunked action logs")
+            action_log, analysis = analyse_large_behaviour_text(behaviour_text, rubric, dimensions_of_interest) #chunk, then find action log and analysis of each chunk
+        else: #if input within chunking threshold limit
+            action_log = text_to_action_log(behaviour_text) #convert input to action log 
+            analysis = None #set analysis to None (so that analysis can be called in the next step)
+    except ModelProviderError as exc: #error 
         raise gr.Error(
             f"The configured model provider could not create the action log: {exc}"
         ) from exc
@@ -122,11 +129,8 @@ def analyse_behaviour(behaviour_text, selected_dimensions, custom_prompt, progre
 
     progress(0.45, desc="Scoring the selected behaviour dimensions") #displays on screen current stage of scoring the dimensions - call get_behaviour_analysis
     try:
-        analysis = get_behaviour_analysis(
-            text_input=action_log,
-            rubric=rubric,
-            dimensions_of_interest=dimensions_of_interest,
-        )
+        if analysis is None: #if the input does not have to be chunked, run analysis
+            analysis = get_behaviour_analysis(text_input=action_log, rubric=rubric, dimensions_of_interest=dimensions_of_interest)
     except ModelProviderError as exc:
         raise gr.Error(
             f"The configured model provider could not complete the analysis: {exc}"
@@ -137,7 +141,7 @@ def analyse_behaviour(behaviour_text, selected_dimensions, custom_prompt, progre
             f"Details: {exc}"
         ) from exc
 
-    progress(0.95, desc="Preparing results") # displays on screen the current stage of fetching and compiling results in a readable style
+    progress(0.95, desc="Preparing results")
     percentage = analysis.get("overall_human_likeness_percentage", "Not provided")
     classification = analysis.get("classification", "Not provided")
     model_summary = analysis.get("classification_summary", "No summary was returned.")
