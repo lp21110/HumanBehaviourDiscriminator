@@ -5,44 +5,23 @@ from .identify_behaviour_dimensions import parse_behaviour_dimension_reply
 from .model_provider import get_model_provider
 
 
-def get_behaviour_analysis(
-    text_input,
-    rubric=BEHAVIOUR_CATEGORY_RUBRIC,
-    user_dimension_reply=None,
-    dimensions_of_interest=None,
-):
-    # Add the text input to the prompt
-    ''' 
-        The input log is assumed to be in the form of a structured log (detailed events with timestamp for each action)
-        of the simulation. 
-        The function will preprocess the text input to extract the relevant information for identifying the state of the simulation at each time step. These cover Intentionality, 
-        Coherence, Agency, Adaptability, Routine and Variability, Practical Know-How, Imperfection, Preferences and Non-Optimal behaviour, Emotional Expression, Error and Error
-        Recovery, Temporal Realism, Micro-Behaviour presence, and Social Interactions. 
-        The function will identify the state of the simulation at each time step based on the information extracted from the text input, 
-        including agents actions, movements, interactions with the environment and other agents, time stamps, time taken for each action and movement, task progress, and 
-        emotional state of the agent.
-        The function will then use this information to identify patterns in agent behaviour and rank them on a scale from 10 (human) to 0 (generated). These patterns covered by 
-        the prompts include Intentionality, Coherence, Agency, Adaptability, Routine and Variability, Practical Know-How, Imperfection, Preferences and Non-Optimal behaviour, 
-        Emotional Expression, Error and Error Recovery, Temporal Realism, Micro-Behaviour presence, and Social Interactions. 
-
-        
-        #Step 1: REMOVED PROMPT FROM USER PROMPT
-        #- If text_input is not already in a behavioural action-log format, literally and precisely convert it into a behavioural action log. 
-        #- Record each seperate observable action taken and the timestep at which actions occur.
-        #- Only include actions explicitly present in the transcript
-        #- Do not invent, assume or ass actions that are not recorded
-    '''
-
+def get_behaviour_analysis(text_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC, user_dimension_reply=None, dimensions_of_interest=None, include_summary=True):
     ''' 
     Input: 
         dimensions: The behavioural dimensions the user wishes to analyse. 
-            Possible dimensions include Intentionality, Coherence, Agency, Adaptability, Routine and Variability, Practical Know-How, Imperfection, Preferences and Non-Optimal 
-            behaviour, Emotional Expression, Error and Error Recovery, Temporal Realism, Micro-Behaviour presence, and Social Interactions. 
-        
-        text_input: A description of the agents actions and movements expected in natural language format. Expected as a 
-    '''
-    #define prompt
+            Possible dimensions include Adaptability, Human Imperfections, Recovery, Preferences and Non-Optimality, Micro-Behaviour, Environmental Context, Physiological 
+            context, Attentiveness, Foresight and Social.
+        text_input: An action log of the agent's actions and movements. Expected in natural language format
+        rubric: The behaviour rubric to use for the analysis, containing prompts for each dimension.
+        user_dimension_reply: The user reply to the prompt asking which dimensions to analyse. This can be a list of dimensions, or a custom prompt provided by the user.
+        dimensions_of_interest: A list of dimensions to analyse. If None, all dimensions in the rubric will be analysed.
+        include_summary: Whether to include a summary of the overall human-likeness score and reasoning for the score. If False, only the category scores will be returned.
 
+    Output:
+        Dictionary containing all the details of the final behavioural analysis for the input transcript.
+        These include: overall_human_likeness_percentage score, the final classification of human or generated, summary of the classification reasonings, and the rubric categories considered
+    '''
+    
     if user_dimension_reply is not None:
         dimensions_of_interest, rubric = parse_behaviour_dimension_reply(user_dimension_reply, rubric)
     elif dimensions_of_interest is None:
@@ -52,7 +31,6 @@ def get_behaviour_analysis(
         raise ValueError("At least one behaviour dimension is required.")
 
     model_provider = get_model_provider()
-
 
 
     #Define the prompt for the behavior discriminator
@@ -141,6 +119,12 @@ def get_behaviour_analysis(
     else:
         final_overall_classification = 'generated-like'
 
+
+    if not include_summary:
+        return {
+            "categories": categories,
+            "dimensions_of_interest": dimensions_of_interest,
+        }
 
     #call LLM for a summary for the score reasoning and evidence for the overall human-likeness score, considering the scored categories in the list 'categories'   
     user_prompt_2_summary = f"""Using the categories in the list 'categories', return a summary for the overall human-likeness score, including reasoning 
