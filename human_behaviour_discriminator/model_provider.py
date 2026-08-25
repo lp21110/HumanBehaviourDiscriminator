@@ -7,6 +7,7 @@ import os
 from functools import lru_cache
 from typing import Any
 
+
 #ERROR FOR MODEL OUTPUTS IF NOT IN/ CANNOT BE CONVERTED TO A JSON FORMAT 
 class ModelProviderError(RuntimeError): 
     """
@@ -86,11 +87,11 @@ class PrivateAPI:
 
 
         base_url = os.getenv("HBD_API_BASE_URL","https://agx1-1.taildbf607.ts.net/v1",)
-        api_key = os.environ["HBD_API_KEY"] #get the API key from $env:HBD_API_KEY
-
+        #api_key = os.environ["HBD_API_KEY"] #get the API key from $env:HBD_API_KEY
+        api_key = "1237899"
 
         default_model = "jetson/qwen3.5-9b-q8_0" #here can alter the defaut model
-        self.model = os.getenv("HBD_API_MODEL", default_model,) #access the model specifiec in environment to run, if none specified run default model
+        self.model = os.getenv("HBD_API_MODEL", default_model,) #access the model specific in environment to run, if none specified run default model
 
         self.client = OpenAI(api_key = api_key, base_url = base_url,)
 
