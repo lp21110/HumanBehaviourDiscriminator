@@ -40,11 +40,13 @@ OpenAI model: jetson/qwen3.5-9b-q8_0
 
 **For Private API:**  
 1. Set the environment variable 'HBD_MODEL_PROVIDER' to "private_api". This variable selects from where to call the large language model.
-2. Assign the environement variable 'HDB_API_KEY' your API key.  
-`$env:HBD_MODEL_PROVIDER="private_api"`    
+2. IF you wish to connect to a specific API, set the environment variable 'HBD_API_BASE_URL' to your API base URL
+4. Assign the environment variable 'HDB_API_KEY' your API key.  
+`$env:HBD_MODEL_PROVIDER="private_api"`  
+`$env:HBD_API_BASE_URL="yourAPIbaseURL"`      
 `$env:HBD_API_KEY="yourAPIkey"`  
 
-3. To call a model other than the default model from the private API, set the environment variable 'HBD_API_MODEL' to either of the below.    
+6. To call a model other than the default model from the private API, set the environment variable 'HBD_API_MODEL' to either of the below.    
 `$env:HBD_API_MODEL="jetson/qwen3.5-27b"`  
 OR  
 `$env:HBD_API_MODEL="jetson/qwen3.5-35b"`
