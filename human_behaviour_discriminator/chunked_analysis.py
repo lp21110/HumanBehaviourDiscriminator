@@ -137,25 +137,59 @@ def analyse_large_behaviour_text(behaviour_text: str, rubric: dict[str, list[str
     categories: list[dict[str, Any]] = [] #set an empty list to store the final analysis of each category after the complete action log has been analysed
     for dimension in dimensions_of_interest: #for each dimension that was analysed
         category_results = results_by_category[dimension] #access the analysis results for the current dimension for all the chunks of the action log
-        total_weight = sum(weight for _, weight in category_results) #weight determined by the number of actions in each chunk. total weight sums all the weights in the category (sums weights of all the chunks)
-        average = sum(item["average_score_of_category"] * weight for item, weight in category_results) / total_weight #sums the (average scoring * weightage) value of each category, then divides by the total sum of weights 
+        scored_results = [
+            (item, weight)
+            for item, weight in category_results
+            if isinstance(item.get("average_score_of_category"), (int, float))
+        ]
         evidence = "\n\n".join(
             f"Chunk {index + 1}: {item.get('score_evidence', '')}"
             for index, (item, _) in enumerate(category_results)
             if item.get("score_evidence")
         )
-        categories.append({ #to the empty list previously defined, append the overall category scores for the whole input, from combining analysis outputs of all the individual chunks
-            "category": dimension, 
-            "average_score_of_category": round(average, 2), #round the score to 2 decimal points
-            "human_or_generated_label": "human-like" if average >= 7 else "generated-like", #output 'human-like' if the score is above 7, adn 'generated-like' if the score is below.
-            "score_evidence": evidence,
-        })
+        if scored_results:
+            total_weight = sum(weight for _, weight in scored_results)
+            average = sum(
+                item["average_score_of_category"] * weight
+                for item, weight in scored_results
+            ) / total_weight
+            categories.append({
+                "category": dimension,
+                "average_score_of_category": round(average, 2),
+                "human_or_generated_label": "human-like" if average >= 7 else "generated-like",
+                "score_evidence": evidence,
+            })
+        else:
+            categories.append({
+                "category": dimension,
+                "average_score_of_category": "N/A",
+                "human_or_generated_label": "N/A",
+                "score_evidence": evidence,
+            })
 
-    overall = round(sum(item["average_score_of_category"] for item in categories) / len(categories) * 10, 2) #the overall human-likeness score, combining the scores from all the categories analysed.
+    scored_categories = [
+        item for item in categories
+        if isinstance(item["average_score_of_category"], (int, float))
+    ]
+    overall = (
+        round(
+            sum(item["average_score_of_category"] for item in scored_categories)
+            / len(scored_categories) * 10,
+            2,
+        )
+        if scored_categories
+        else "N/A"
+    )
     analysis = { #the final analysis output, combining output from all the individual chunks
         "overall_human_likeness_percentage": overall, 
-        "classification": "human-like" if overall >= 70 else "generated-like", 
-        "classification_summary": "Scores were calculated from independently analysed action-log chunks and weighted by the number of actions in each chunk.",
+        "classification": (
+            "human-like" if overall >= 70 else "generated-like"
+        ) if isinstance(overall, (int, float)) else "N/A",
+        "classification_summary": (
+            "Scores were calculated from independently analysed action-log chunks and weighted by the number of actions in each chunk."
+            if scored_categories
+            else "No overall score was calculated because all selected categories had insufficient evidence."
+        ),
         "categories": categories,
         "dimensions_of_interest": dimensions_of_interest,
         "processing": {"mode": "chunked", "transcript_chunks": len(split_transcript(behaviour_text))}, #can access whether it was analysed as a whole text or in chunks

@@ -9,7 +9,7 @@ from human_behaviour_discriminator.chunked_analysis import analyse_large_behavio
 
 
 DIMENSION_NAMES = list(BEHAVIOUR_CATEGORY_RUBRIC) #the default rubric to use for analysis
-CHUNKING_THRESHOLD_CHARS = 16_000 #the character limit for when to chunk the input 
+CHUNKING_THRESHOLD_CHARS = 9_000 #the character limit for when to chunk the input 
 
 DIMENSION_CHOICES = [ #access the prompts for the behavioural dimensions the user wants to analyse from the behavioural rubric 
     (
@@ -145,10 +145,11 @@ def analyse_behaviour(behaviour_text, selected_dimensions, custom_prompt, progre
     percentage = analysis.get("overall_human_likeness_percentage", "Not provided")
     classification = analysis.get("classification", "Not provided")
     model_summary = analysis.get("classification_summary", "No summary was returned.")
+    percentage_display = f"{percentage}%" if isinstance(percentage, (int, float)) else percentage
     summary = (
         "## Analysis result\n"
         f"**Classification:** {classification}  \n"
-        f"**Human-likeness:** {percentage}%  \n\n"
+        f"**Human-likeness:** {percentage_display}  \n\n"
         f"{model_summary}"
     )
 
@@ -205,7 +206,7 @@ def build_app():
                         "Reasoning",
                         "Evidence",
                     ],
-                    datatype=["str", "number", "str", "str", "str"],
+                    datatype=["str", "str", "str", "str", "str"],
                     interactive=False,
                     label="Scores by category",
                 )

@@ -55,11 +55,11 @@ def get_behaviour_analysis(text_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC, user_di
             - Only include actions explicitly present in the input. Do not infer or invent acions such as hidden actions, intentions, locations, emotions, mistakes, missing steps
             - Do not invent or assume actions that are not recorded
             - Give each question a score between 0 to 10, where 0= strongly generated-like, 5=ambiguous, and 10= strongly human-like 
-            - If the category is 'SOCIAL', only consider if there is a presence of another agent. Else provide a scoring of 5.
-            - If the category is 'TIMING', only consider inputs which have time logs for actions. If the action log does not include times, provide a scoring of 5.
-            - If a behaviour has insufficient evidence, assign a score of 5 rather than assuming it is generated-like or human-like. Provide this as the evidence for the scoring.
-            - Provide what from the actions in the transcript contributed to the score given, including if category is scored with insufficient evidence 
-            - Calculate the average of the prompt scores in the category
+            - If the category is 'SOCIAL', only consider it when another agent is present. Otherwise, there is insufficient evidence.
+            - If the category is 'TIMING', only consider it when the action log contains action times. Otherwise, there is insufficient evidence.
+            - If there is insufficient evidence for the current category, set "average_score_of_category" to "N/A". Do not assign a numeric score.
+            - When returning "N/A", explain why evidence is insufficient in both "score_reasoning" and "score_evidence".
+            - When evidence is sufficient, calculate the average of the prompt scores in the category.
 
             Behaviour input: 
             {text_input}
@@ -82,42 +82,49 @@ def get_behaviour_analysis(text_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC, user_di
             user_prompt=user_prompt,
         )
 
-        try:
-            average_score = float(parsed_response["average_score_of_category"])
-        except (KeyError, TypeError, ValueError) as exc:
-            raise ValueError(
-                f"The model returned an invalid average score for {dimension}."
-            ) from exc
-
-        if not 0 <= average_score <= 10:
-            raise ValueError(
-                f"The model score for {dimension} must be between 0 and 10."
-            )
-
         parsed_response["category"] = dimension
-        parsed_response["average_score_of_category"] = average_score
+        returned_score = parsed_response.get("average_score_of_category")
+        if isinstance(returned_score, str) and returned_score.strip().upper() == "N/A":
+            parsed_response["average_score_of_category"] = "N/A"
+            parsed_response["human_or_generated_label"] = "N/A"
+        else:
+            try:
+                average_score = float(returned_score)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"The model returned an invalid average score for {dimension}."
+                ) from exc
 
-        #use the average category score to classify the category as human-like or generated-like:
-        if average_score >= 7: #if the average score is greater than 7, classify as human-like
-            parsed_response['human_or_generated_label'] = 'human-like'
-        else: #if average score is less than 7, classify as generated-like 
-            parsed_response['human_or_generated_label'] = 'generated-like'
+            if not 0 <= average_score <= 10:
+                raise ValueError(
+                    f"The model score for {dimension} must be between 0 and 10."
+                )
+
+            parsed_response["average_score_of_category"] = average_score
+            parsed_response["human_or_generated_label"] = (
+                "human-like" if average_score >= 7 else "generated-like"
+            )
 
         #add the current category analysis to list of categories to calculate overall scorings and return analysis to user
         categories.append(parsed_response)
 
 
-    #now find the average of the average scores and classify an overall human-likeness score for the given text
-    overall_average_score = sum(
-        category["average_score_of_category"] for category in categories
-    ) / len(categories)
-    overall_human_likeness_percentage = round(overall_average_score * 10, 2)
-
-    #calculate overall human-likeness classification based on average score
-    if overall_human_likeness_percentage >= 70:
-        final_overall_classification = 'human-like'
+    scored_categories = [
+        category
+        for category in categories
+        if isinstance(category["average_score_of_category"], (int, float))
+    ]
+    if scored_categories:
+        overall_average_score = sum(
+            category["average_score_of_category"] for category in scored_categories
+        ) / len(scored_categories)
+        overall_human_likeness_percentage = round(overall_average_score * 10, 2)
+        final_overall_classification = (
+            "human-like" if overall_human_likeness_percentage >= 70 else "generated-like"
+        )
     else:
-        final_overall_classification = 'generated-like'
+        overall_human_likeness_percentage = "N/A"
+        final_overall_classification = "N/A"
 
 
     if not include_summary:
@@ -126,26 +133,32 @@ def get_behaviour_analysis(text_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC, user_di
             "dimensions_of_interest": dimensions_of_interest,
         }
 
-    #call LLM for a summary for the score reasoning and evidence for the overall human-likeness score, considering the scored categories in the list 'categories'   
-    user_prompt_2_summary = f"""Using the categories in the list 'categories', return a summary for the overall human-likeness score, including reasoning 
+    if not scored_categories:
+        final_output_summary = (
+            "No overall human-likeness score was calculated because all selected "
+            "categories had insufficient evidence."
+        )
+    else:
+        # Call the model for an overall summary using only categories with numeric scores.
+        user_prompt_2_summary = f"""Using the categories in the list 'categories', return a summary for the overall human-likeness score, including reasoning 
         and evidence for the score given. Only consider the scored categories in the list 'categories'. 
     
         overall human-likeness percentage:
         {overall_human_likeness_percentage}
         
         categories: 
-        {json.dumps(categories, indent=2)}
+        {json.dumps(scored_categories, indent=2)}
 
         Return valid JSON only: 
         {{"summary": ""}}
 
     """
 
-    parsed_response_2_summary = model_provider.generate_json(
-        system_prompt=system_prompt,
-        user_prompt=user_prompt_2_summary,
-    )
-    final_output_summary = parsed_response_2_summary.get("summary", "")
+        parsed_response_2_summary = model_provider.generate_json(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt_2_summary,
+        )
+        final_output_summary = parsed_response_2_summary.get("summary", "")
     #group all the results together for complete final analysis
     final_analysis = {
         "overall_human_likeness_percentage": overall_human_likeness_percentage,

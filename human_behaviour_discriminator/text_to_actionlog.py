@@ -4,11 +4,15 @@ from .model_provider import get_model_provider
 def text_to_action_log(text_input):
 
     '''
-    Timing is depedent on the input: 
+    Role: From the text input, find the state of the agent at each time-step for the behavioural analysis. 
+        'Action' entails any movements, interactions with the environment and other agents. ALso records time stamps, time taken for each action and movement, task progress
+    
+    Whether timing is included is depedent on the input: 
         If timing is provided alongside the text input, return an action log alongside the times at which they occurred. 
         Else, create an action log without a corresponding time record. (Can later analyse with all behaviour categories in rubric other than time.
             In this case, the timing recorded will be qualitative; if there are cues towards duration of actions or relative action times
     '''
+    
     prompt = f"""Convert the following text input into a structured action log, recording each individual action seperately.
         
         If text input has explicit timestamps, for each action give its step in the sequence, its timestamp and short description of the action.
