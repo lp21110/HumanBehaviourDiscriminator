@@ -84,7 +84,7 @@ class Deepseek:
     def __init__(self):
         from openai import OpenAI
         
-        self.client = OpenAI(api_key=os.environ("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com")
+        self.client = OpenAI(api_key=os.environ["DEEPSEEK_API_KEY"], base_url="https://api.deepseek.com")
         self.model = "deepseek-v4-flash"
 
     def generate_json(self, system_prompt: str, user_prompt: str) -> dict[str, Any]: 
