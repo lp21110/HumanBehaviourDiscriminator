@@ -2,6 +2,8 @@
 ##for input texts, 9000 characters is chosen as a smaller limit to ensure that the model has enough context to create an accurate action log from the input text.
 ##for action logs, 12000 characters is chosen as a larger limit so that the model has enough context to analyse each action log cluster accurately
 
+#Aim: inputs that are too long to be analysed are split into smaller chunks of transcript. For each chunk the whole process of conversion to action log, and then analysis of the action log is applied. Then these are combined to find an overall analysis and score. 
+
 from __future__ import annotations #stores type hints (the data type of a variable) as strings until something explicitely asks for the real data type.
 ## 'type annotation': indicates what type of value/s a variable is expected to hold, or what type of value/s a function is expected to return without python actually enforcing it
 ## essentially defines the expected data type of a variable or function return value, but does not enforce it at runtime.
@@ -40,7 +42,7 @@ def split_transcript(text: str, max_chars: int = DEFAULT_TRANSCRIPT_CHUNK_CHARS)
     # for a transcript pasted from a single Notepad line.
     units = text.splitlines(keepends=True) #splits the input text transcript string into list of lines. Splits at linebreaks, and keeps where the linebreaks are in the original string.
     if len(units) <= 1: #if the input text transcript does not have any linebreaks, split at the end of each sentence.
-        units = text.replace(". ", ".\n").replace("! ", "!\n").replace("? ", "?\n").splitlines(keepends=True) #add linebreak after common sentence-ending punctuation
+        units = text.replace(". ", ".\n").replace("! ", "!\n").replace("? ", "?\n").replace("'", "'\n").splitlines(keepends=True) #add linebreak after common sentence-ending punctuation
 
     chunks: list[str] = [] #empty list to store the chunks of the input text transcript
     current = "" 
@@ -103,6 +105,7 @@ def analyse_large_behaviour_text(behaviour_text: str, rubric: dict[str, list[str
     dimensions_of_interest - the behavioural dimensions that you want to analyse the text for. List of strings data type.
 
     Output:
+    A tuple of the complete action log, and analysis for each chunk
 
     Method:
     Scores are weighted by the number of observed actions in each scoring chunk (the higher the number of actions in a chunk the higher weightage the chunk has).
