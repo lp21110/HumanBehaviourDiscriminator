@@ -1,7 +1,8 @@
 # HumanBehaviourDiscriminator
 
 ### Project Overview:  
-Distinguishing between generated vs human behaviour for a given text input. The text input is assumed to entail an action sequence or a description of such. Refer to L1 Diagram and L2 Diagram for a general overview of the implemented pipeline.
+Distinguishing between generated vs human behaviour for a given text or video input. Refer to L1 Diagram and L2 Diagram for a general overview of the implemented pipeline.  
+The text and video inputs are assumed to entail an action sequence or a description/ depiction of such.  
 
 ### Behaviour Analysis Rubric:
 The following are the behavioural dimensions covered in the pre-defined rubric and a summary of what they assess.
