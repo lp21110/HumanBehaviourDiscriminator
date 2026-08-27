@@ -106,7 +106,7 @@ Input Options:
 - Video: file upload, or URL  
 - Analysis Categories: Can select the behavioural categories from the defined rubric, and can input their own prompt. 
 
-Text inputs that are too long (above ---) are split into smaller chunks which fit into the context window for analysis.  
+Text inputs that are too long are split into smaller chunks which fit into the context window for analysis.  
 
 **The User can see the following output:**  
 - Overall human-likeness percentage for chosen categories  
