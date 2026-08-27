@@ -27,11 +27,11 @@ Install the required packages from below before running the interface:
 
 **For Ollama Model (default)**  
 LLM: Ollama  
-Ollama model: qwen3.5:9b
+Ollama model (default): qwen3.5:9b
 
 **For Deepseek Model**
 LLM: DeepSeek  
-OpenAI Deepseek model: deepseek-v4-flash  
+OpenAI Deepseek model (default): deepseek-v4-flash  
 (requires API key)  
 
 **For Private API**  
@@ -45,8 +45,13 @@ Default private model: jetson/qwen3.5-9b-q8_0
 
 **Gemini**  
 LLM: Gemini  
-Gemini model: gemini-3.7-flash  
+Gemini model (default): gemini-3.7-flash  
 (requires API key - free)  
+Issues with model choice: Frequently becomes too 'high demand' when used in Free Tier. Can replace with previous models:  
+  'gemini-3.6-flash'  
+  'gemini-3.5-flash'  
+  'gemini-3.5-flash-lite'  
+  But, might loose accuracy quality in video captioning.
 
 ## How to call through terminal:  
 
@@ -54,12 +59,16 @@ Setting the environment variables:
 (refer to env.example for possible environement varaibles)  
 
 **For Ollama (default):**  
-1. Directly call the user interface.  
+1. To call a model other than the default, set the environment variable 'OLLAMA_MODEL'  
+`$env:OLLAMA_MODEL="your-ollama-model"`  
+2. Directly call the user interface.  
 
 **For Deepseek:**  
-1. Set the DeepSeek API key and select the DeepSeek provider.  
+1. Select the DeepSeek provider and set the DeepSeek API key.  
 `$env:MODEL_PROVIDER="deepseek"`  
 `$env:DEEPSEEK_API_KEY="yourAPIkey"`  
+2. To call a model other than the default, set the environment variable 'DEEPSEEK_MODEL'  
+`$env:DEEPSEEK_MODEL="your-deepseek-model"`  
 
 **For Private:**  
 1. Set the environment variable 'MODEL_PROVIDER' to "private".
@@ -78,6 +87,8 @@ OR
 **For video inputs:**  
 1. Set the Gemini API key.  
 `$env:GEMINI_API_KEY="yourAPIkey"`  
+2. To call a model other than the default, set the environment variable 'GEMINI_MODEL'  
+`$env:GEMINI_MODEL="your-gemini-model"`  
 
 Now call the user interface:  
 
