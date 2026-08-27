@@ -196,7 +196,7 @@ class Gemini:
             )
 
         self.client = genai.Client(api_key=api_key)
-        self.model = "gemini-3.7-flash"
+        self.model = os.getenv("GEMINI_MODEL","gemini-3.7-flash")
         self.time = time
 
     def generate_json(self, video_input_type : str, video_input, system_prompt: str) -> str:
