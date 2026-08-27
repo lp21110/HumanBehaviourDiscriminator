@@ -18,7 +18,7 @@ The following are the behavioural dimensions covered in the pre-defined rubric a
  > - **FORESIGHT**: Assesses planning, ability to bundle related actions (i.e. taking multiple items out of the drawer at the same time for varying tasks), postponing goals, and managing multiple goals.  
  > - **SOCIAL**: Assesses adaptation, coordination, and awareness when other agents or living beings are present.  
 
-  Other dimensions considered include: INTENTIONALITY, ROUTINE, EMOTIONS, TIMING, and MICRO-BEHAVIOUR.  
+  Other dimensions considered include: INTENTIONALITY, ROUTINE and EMOTIONS.  
 
 ## Usage requirements/ Dependencies:
 
