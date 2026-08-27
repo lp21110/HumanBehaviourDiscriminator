@@ -23,7 +23,7 @@ The following are the behavioural dimensions covered in the pre-defined rubric a
 ## Usage requirements/ Dependencies:
 
 Install the required packages from below before running the interface:  
-`pip install -r requirements.txt`
+`pip install -r requirements.txt`  
 
 **For Ollama Model (default)**  
 LLM: Ollama  
@@ -51,6 +51,7 @@ Gemini model: gemini-3.7-flash
 ## How to call through terminal:  
 
 Setting the environment variables:  
+(refer to env.example for possible environement varaibles)  
 
 **For Ollama (default):**  
 1. Directly call the user interface.  
@@ -61,14 +62,14 @@ Setting the environment variables:
 `$env:DEEPSEEK_API_KEY="yourAPIkey"`  
 
 **For Private:**  
-1. Set the environment variable 'HBD_MODEL_PROVIDER' to "private_api".
-2. IF you wish to connect to a specific API, set the environment variable 'HBD_API_BASE_URL' to your API base URL
-3. Assign the environment variable 'HBD_API_KEY' your API key.  
+1. Set the environment variable 'MODEL_PROVIDER' to "private".
+2. IF you wish to connect to a specific API, set the environment variable 'PRIVATE_BASE_URL' to your API base URL
+3. Assign the environment variable 'PRIVATE_API_KEY' your API key.  
 `$env:MODEL_PROVIDER="private"`  
 `$env:PRIVATE_BASE_URL="yourbaseURL"`      
 `$env:PRIVATE_API_KEY="yourAPIkey"`  
 
-4. (Specific to default private_api) To call a model other than the default model, set the environment variable 'HBD_API_MODEL' to either of the following.    
+4. (Specific to the default Private model) To call a model other than the default model, set the environment variable 'PRIVATE_MODEL' to either of the following.    
 `$env:PRIVATE_MODEL="jetson/qwen3.5-27b"`  
 OR  
 `$env:PRIVATE_MODEL="jetson/qwen3.5-35b"`

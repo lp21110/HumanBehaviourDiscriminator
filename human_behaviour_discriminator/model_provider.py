@@ -58,7 +58,7 @@ class Ollama:
         import ollama
 
         self.client = ollama.Client(host=os.getenv("OLLAMA_HOST") or None) #establish connection to the ollama server running on local machine or remote server
-        self.model = os.getenv("HBD_OLLAMA_MODEL", "qwen3.5:9b") #establish model used for the ollama provider. qwen3.5:9b is used as default 
+        self.model = os.getenv("OLLAMA_MODEL", "qwen3.5:9b") #establish model used for the ollama provider. qwen3.5:9b is used as default 
 
     def generate_json(self, system_prompt: str, user_prompt: str) -> dict[str, Any]: 
         '''
@@ -86,7 +86,7 @@ class Deepseek:
         from openai import OpenAI
         
         self.client = OpenAI(api_key=os.environ["DEEPSEEK_API_KEY"], base_url="https://api.deepseek.com")
-        self.model = "deepseek-v4-flash"
+        self.model = os.getenv("DEEPSEEK_MODEL", "deepseek-v4-flash")
 
     def generate_json(self, system_prompt: str, user_prompt: str) -> dict[str, Any]: 
         response = self.client.chat.completions.create(
@@ -103,22 +103,22 @@ class Deepseek:
 
 
 #PRIVATE API CONFIGURATION 
-class PrivateAPI:
+class Private:
     """
     Generate JSON through the private API model gateway.
     """
 
-    name = "private_api"
+    name = "private"
 
     def __init__(self):
         from openai import OpenAI
 
 
-        base_url = os.getenv("HBD_API_BASE_URL","https://agx1-1.taildbf607.ts.net/v1",) #PRIVATE API base URL set to the one provided 
-        api_key = os.getenv("HBD_API_KEY") #get the API key from $env:HBD_API_KEY
+        base_url = os.getenv("PRIVATE_BASE_URL","https://agx1-1.taildbf607.ts.net/v1",) #PRIVATE API base URL set to the one provided 
+        api_key = os.getenv("PRIVATE_API_KEY") #get the API key from $env:PRIVATE_API_KEY
 
         default_model = "jetson/qwen3.5-9b-q8_0" #here can alter the defaut model
-        self.model = os.getenv("HBD_API_MODEL", default_model) #access the model specific in environment to run, if none specified run default model
+        self.model = os.getenv("PRIVATE_MODEL", default_model) #access the model specific in environment to run, if none specified run default model
 
         self.client = OpenAI(api_key = api_key, base_url = base_url)
 
@@ -141,7 +141,7 @@ class PrivateAPI:
                     )
 
         except Exception as exc: 
-            raise ModelProviderError("The Private API gateway request failed") from exc 
+            raise ModelProviderError("The Private gateway request failed") from exc 
         
         if isinstance(response, str):
             generated_response = response
@@ -292,23 +292,22 @@ class Qwen:
 #--------------------------------------------------------------------------------------------------------------------------------------
 
 
-def get_model_provider() -> Ollama | Deepseek | PrivateAPI:
+def get_model_provider() -> Ollama | Deepseek | Private:
 
     """
-    Returns and calls/uses the selected backend (either Ollama, Deepseek or Private API).
+    Returns and calls/uses the selected backend (either Ollama, Deepseek or Private).
     If neither are chosen, returns an error message.
 
     Ollama is set as the default.
     """
 
-    provider_name = os.getenv("HBD_MODEL_PROVIDER", "ollama").strip().lower() #specify private_api befor calling, or will use ollama provider as default
+    provider_name = os.getenv("MODEL_PROVIDER", "ollama").strip().lower() #specify private before calling, or Ollama will be used by default
 
     if provider_name == "ollama":
         return Ollama() 
     if provider_name == "deepseek":
         return Deepseek()
-    if provider_name == "private_api":
-        return PrivateAPI()
+    if provider_name == "private":
+        return Private()
     
-    raise ModelProviderError("HBD_MODEL_PROVIDER must be 'ollama', 'deepseek' or 'private_api'.")
-
+    raise ModelProviderError("MODEL_PROVIDER must be 'ollama', 'deepseek' or 'private'.")
