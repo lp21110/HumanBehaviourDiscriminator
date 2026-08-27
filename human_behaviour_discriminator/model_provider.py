@@ -163,6 +163,61 @@ class PrivateAPI:
     
 
 
+#-FOR VIDEO INPUTS----------------------------------------------------------------------------------------------------
+
+#Using Gemini API - file APIS
+#gemini: 1FramePerSecond sampling rate so might lose accuracy - slow down clips?
+    
+import base64
+
+class Gemini:
+    """
+    Analyse and create an action log via Gemini API model gateway 
+    """
+    name = "Gemini"
+
+    def __init__(self):
+        from google import genai
+        import time as time 
+
+        self.client = genai.Client(api_key="your-API-key-here")
+        self.model = "gemini-3.7-flash"
+        self.time = time
+
+    def generate_json(self, video_input_type : str, video_input, system_prompt: str) -> dict[str, Any]:
+
+        if video_input_type == "file_upload":
+            myfile = self.client.files.upload(file=video_input)
+
+            while not myfile.state or myfile.state.name != "ACTIVE":
+                self.time.sleep(5)
+                myfile = self.client.files.get(name=myfile.name)
+
+            interaction = self.client.interactions.create(
+                model= self.model,
+                input=[
+                    {"type": "video", "uri": myfile.uri, "mime_type": myfile.mime_type},
+                    {"type": "text", "text": system_prompt}
+                ]
+            )
+
+        if video_input_type == "url":
+
+            interaction = self.client.interactions.create(
+                model= self.model,
+                input=[
+                    {"type": "text", "text": system_prompt},
+                    {"type": "video", "uri": video_input}
+                ]
+            )
+
+        generated_response = interaction.output_text
+
+        return _decode_json_object(generated_response)
+    
+    #Using Gemini API - youtube URL's
+
+
 #@lru_cache(maxsize=1)
 def get_model_provider() -> Ollama | PrivateAPI:
 
