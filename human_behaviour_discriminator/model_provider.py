@@ -198,26 +198,18 @@ class Gemini:
             while not myfile.state or myfile.state.name != "ACTIVE":
                 self.time.sleep(5)
                 myfile = self.client.files.get(name=myfile.name)
+            contents = [system_prompt, video_input]
 
-            interaction = self.client.interactions.create(
+
+        elif video_input_type == "url":
+            contents = [system_prompt, video_input]
+
+
+        response = self.client.models.generate_content(
                 model= self.model,
-                input=[
-                    {"type": "video", "uri": myfile.uri, "mime_type": myfile.mime_type},
-                    {"type": "text", "text": system_prompt}
-                ]
-            )
-
-        if video_input_type == "url":
-
-            interaction = self.client.interactions.create(
-                model= self.model,
-                input=[
-                    {"type": "text", "text": system_prompt},
-                    {"type": "video", "uri": video_input}
-                ]
-            )
-
-        generated_response = interaction.output_text
+                content = content)
+            
+        generated_response = response.text
 
         return _decode_json_object(generated_response)
     
