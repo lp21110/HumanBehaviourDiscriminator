@@ -20,6 +20,8 @@ The following are the behavioural dimensions covered in the pre-defined rubric a
  > - **SOCIAL**: Assesses adaptation, coordination, and awareness when other agents or living beings are present.  
 
   Other dimensions considered include: INTENTIONALITY, ROUTINE and EMOTIONS.  
+ 
+For more information and references about the prompts, refer to the AnalysisRubricPrompt_Reference document.  
 
 ## Usage requirements/ Dependencies:
 
