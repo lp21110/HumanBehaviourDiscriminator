@@ -174,14 +174,12 @@ def analyse_video(video_input, video_input_type, selected_dimensions, custom_pro
     progress(0.1, desc="Converting the video inputted into an action log") #dsiplays on screen current step of converting input text to an action log 
 
     #1. convert to behaviour text
-    video_action_log = video_to_action_log(video_input_type, video_input) #convert input to action log 
+    video_caption = video_to_action_log(video_input_type, video_input) #caption video 
 
+    video_action_log = text_to_action_log(video_caption) #get action log from caption (instead of trying to get it directly)
 
     #run analysis on the generated captions/ action logs
     progress(0.45, desc="Scoring the selected behaviour dimensions") #displays on screen current stage of scoring the dimensions - call get_behaviour_analysis
-
-    #action_log_size = len(json.dumps(video_action_log))
-    #if action_log_size > DEFAULT_ACTION_LOG_CHUNK_CHARS:
 
     try:
         analysis = get_behaviour_analysis(text_input=video_action_log, rubric=rubric, dimensions_of_interest=dimensions_of_interest)

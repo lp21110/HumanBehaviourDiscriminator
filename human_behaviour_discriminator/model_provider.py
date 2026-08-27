@@ -98,7 +98,7 @@ class Deepseek:
 
         generated_response = response.choices[0].message.content
 
-        return _decode_json_object(generated_response)
+        return generated_response
 
 
 #PRIVATE API CONFIGURATION 
@@ -187,7 +187,7 @@ class Gemini:
             )
 
         self.client = genai.Client(api_key=api_key)
-        self.model = "gemini-3.7-flash"
+        self.model = "gemini-3.6-flash"
         self.time = time
 
     def generate_json(self, video_input_type : str, video_input, system_prompt: str) -> dict[str, Any]:
@@ -212,7 +212,7 @@ class Gemini:
             
         generated_response = response.text
 
-        return _decode_json_object(generated_response)
+        return generated_response
     
     #Using Gemini API - youtube URL's
 
