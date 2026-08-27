@@ -9,7 +9,9 @@ The following are the behavioural dimensions covered in the pre-defined rubric a
  > - **ADAPTABILITY**: Assesses whether behaviour changes with context, feedback, obstacles, prior experience, or revised plans.  
  > - **HUMAN_IMPERFECTIONS**: Assesses for hesitation, forgetfulness, distraction, interruptions, and other imperfections in the action flow.  
  > - **RECOVERY**: Assesses ability to identify mistakes, correct mistakes, self-checking, and whether recovery from mistakes looks natural or overly convenient.  
- > - **PREFERENCES_AND_NON_OPTIMALITY**: Assesses if choices are driven by preference, if just adequate rather than optimal actions are taken, and small routine variations are shown.
+ > - **PREFERENCES_AND_NON_OPTIMALITY**: Assesses if choices are driven by preference, if just adequate rather than optimal actions are taken, and small routine variations are shown.  
+ > - **TIMING**: Assesses the realism of the timing for each action and between each action.  
+ > - **MICRO-BEHAVIOUR**: Assesses automatic or subconscious behaviours with no outward task goal, such as fidgeting or yawning.  
  > - **ENVIRONMENTAL_CONTEXT**: Assesses whether actions respond to and are aligned with objects, surroundings, and environmental constraints.  
  > - **PHYSIOLOGICAL_CONTEXT**: Assesses whether actions are physically plausible and accurately reflect realistic bodily constraints.  
  > - **ATTENTIVENESS**: Assesses monitoring the current scenario, attention shifts, selective awareness, and whether some information is overlooked.  
