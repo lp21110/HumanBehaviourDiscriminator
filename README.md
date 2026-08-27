@@ -22,7 +22,7 @@ The following are the behavioural dimensions covered in the pre-defined rubric a
 
 ## Usage requirements/ Dependencies:
 
-Install the required packages before running the interface:
+Install the required packages from below before running the interface:  
 `pip install -r requirements.txt`
 
 **For Ollama Model (default)**  
