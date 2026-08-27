@@ -4,17 +4,18 @@
 Distinguishing between generated vs human behaviour for a given text input. The text input is assumed to entail an action sequence or a description of such. 
 
 ### Behaviour Analysis Rubric:
-The following are the behavioural dimensions covered in the pre-defined rubric and a summary of what they assess for.
+The following are the behavioural dimensions covered in the pre-defined rubric and a summary of what they assess.
 
  > - **ADAPTABILITY**: Assesses whether behaviour changes with context, feedback, obstacles, prior experience, or revised plans.  
  > - **HUMAN_IMPERFECTIONS**: Assesses for hesitation, forgetfulness, distraction, interruptions, and other imperfections in the action flow.  
  > - **RECOVERY**: Assesses ability to identify mistakes, correct mistakes, self-checking, and whether recovery from mistakes looks natural or overly convenient.  
- > - **PREFERENCES_AND_NON_OPTIMALITY**: Assesses if choices are driven by preference, if just adequate rather than optimal actions are taken, and small routine variations are shown.  
+ > - **PREFERENCES_AND_NON_OPTIMALITY**: Assesses if choices are driven by preference, if just adequate rather than optimal actions are taken, and small routine variations are shown.
+>  - **TIMING**: Assesses realism of the timing for each action and between actions.  
  > - **MICRO-BEHAVIOUR**: Assesses automatic or subconscious behaviours that have no clear goal, such as fidgeting or yawning.  
- > - **ENVIRONMENTAL_CONTEXT**: Assesses whether actions respond and are aligned to objects, surroundings, and environmental constraints.  
+ > - **ENVIRONMENTAL_CONTEXT**: Assesses whether actions respond to and are aligned with objects, surroundings, and environmental constraints.  
  > - **PHYSIOLOGICAL_CONTEXT**: Assesses whether actions are physically plausible and accurately reflect realistic bodily constraints.  
- > - **ATTENTIVENESS**: Assesses monitoring current scenario, attention shifts, selective awareness, and whether some information is overlooked.  
- > - **FORESIGHT**: Assesses planning ahead, ability to bundle related actions (i.e. taking multiple items out the drawer at the same time for varying tasks), postponing goals, and managing multiple goals.  
+ > - **ATTENTIVENESS**: Assesses monitoring the current scenario, attention shifts, selective awareness, and whether some information is overlooked.  
+ > - **FORESIGHT**: Assesses planning, ability to bundle related actions (i.e. taking multiple items out of the drawer at the same time for varying tasks), postponing goals, and managing multiple goals.  
  > - **SOCIAL**: Assesses adaptation, coordination, and awareness when other agents or living beings are present.  
 
   Other dimensions considered include: INTENTIONALITY, ROUTINE, EMOTIONS, TIMING  
@@ -25,18 +26,29 @@ The following are the behavioural dimensions covered in the pre-defined rubric a
 LLM: Ollama  
 Ollama model: qwen3.5:9b
 
+**For Deepseek Model**
+LLM: DeepSeek
+OpenAI Deepseek model: deepseek-v4-flash  
+(requires API key)  
+
 **For Private API**  
-LLM: OpenAI (from openai import OpenAI)  
-OpenAI model: jetson/qwen3.5-9b-q8_0
+LLM: Assumed OpenAI model.  
+Personalise by setting the model and base_url environment variables.  
 
-## How to use:
+Default model: jetson/qwen3.5-9b-q8_0  
+(requires API key)
 
-### Through terminal:
+FOR VIDEO INPUTS (additionally required to one of the above):  
+**Gemini**  
+LLM: Gemini  
+Gemini model: gemini-3.7-flash  
+(requires API key - free)  
+
+## How to call through terminal:  
 
 **For Ollama (default):**  
 1. Call the user interface.  
-`py .\gradio_user_interface.py`
-
+`py .\gradio_user_interface.py`  
 
 **For Private API:**  
 1. Set the environment variable 'HBD_MODEL_PROVIDER' to "private_api". This variable selects from where to call the large language model.
@@ -46,22 +58,23 @@ OpenAI model: jetson/qwen3.5-9b-q8_0
 `$env:HBD_API_BASE_URL="yourAPIbaseURL"`      
 `$env:HBD_API_KEY="yourAPIkey"`  
 
-6. To call a model other than the default model from the private API, set the environment variable 'HBD_API_MODEL' to either of the below.    
+6. To call a model other than the default model from the private API, set the environment variable 'HBD_API_MODEL' to either of the following.    
 `$env:HBD_API_MODEL="jetson/qwen3.5-27b"`  
 OR  
 `$env:HBD_API_MODEL="jetson/qwen3.5-35b"`
 
-This outputs a link to access either a local or online host to the (gradio) discriminator user interface.  
+This outputs a link to access either a local or online host for the (gradio) discriminator user interface.  
 
 ## Using the Interface
 
 **The User inputs:**  
-- The text to analyse  
-- Select the behavioural categories from the defined rubric to analyse text for
-- Can input their own prompt to analyse the text for. 
+Input Options:  
+- Text: Enter into textbox on screen  
+- Video: file upload, or URL  
+- Analysis Categories: Can select the behavioural categories from the defined rubric, and can input their own prompt. 
 
 **The User can see the following output:**  
 - Overall human-likeness percentage for chosen categories  
-- Classification  
+- Classification (Human-like or Generated-like)  
 - Classification reasoning summary  
-- The individual behavioural categories analysed, their independent scores and score reasoning  
+- For each chosen behavioural category, its classification, its independent scores, and in-depth score reasoning  
