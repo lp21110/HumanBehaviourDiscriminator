@@ -98,7 +98,7 @@ class Deepseek:
 
         generated_response = response.choices[0].message.content
 
-        return generated_response
+        return _decode_json_object(generated_response)
 
 
 #PRIVATE API CONFIGURATION 
