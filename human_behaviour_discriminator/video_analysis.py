@@ -16,25 +16,21 @@ def video_to_action_log(video_input_type, video_input):
     The semantic sequence/ logical realism of the overall action sequence displayed in the video will be analysed
     """
 
-    video_analysis_system_prompt = f""" Carefully watch the given video and identify each distinct action or movement made by the human/ character. 
+    video_analysis_system_prompt = """Carefully watch the given video and identify each distinct action or movement made by the human/character.
 
-        Return only a JSON array in the format of an action log for each human/ character that is performing the action, in the action log format below: 
-            {
-                "action_log" : [
-                    {
-                        "action_step": 0,
-                        "start_time": 0,
-                        "end_time":  ,
-                        "action": "..."
-                    }
-                ]
-            }
-        Where:
-        'start_time' is the start time of action in seconds
-        'end_time' is the end time of action in seconds
-        'action' is a detailed but accurate description of the action
-        Only include and analyse what is literally in the video, do not make up or invent times, actions or movements.
-        Be precise about timings, amd do not omit any events observed."""
+Return only one valid JSON object in this format:
+{
+  "action_log": [
+    {
+      "action_step": 1,
+      "start_time": 0,
+      "end_time": 1,
+      "action": "detailed description of the observed action"
+    }
+  ]
+}
+
+Use seconds for start_time and end_time. Only include actions literally visible in the video; do not invent events or timings. Be precise and do not omit observed events."""
 
     vllm_model_provider = Gemini()
 
