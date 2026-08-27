@@ -1,6 +1,6 @@
 from .model_provider import get_model_provider
 
-###IMPROVEMENT: INCLUDE 'CLIENT' AS A VARIABLE IN THE FUNCTION SO THAT IT CAN BE SWITCHDE OUT WITH VARYING MODELS 
+
 def text_to_action_log(text_input):
 
     '''

@@ -198,7 +198,8 @@ class Gemini:
             while not myfile.state or myfile.state.name != "ACTIVE":
                 self.time.sleep(5)
                 myfile = self.client.files.get(name=myfile.name)
-            contents = [system_prompt, video_input]
+
+            contents = [system_prompt, myfile]
 
 
         elif video_input_type == "url":
@@ -207,7 +208,7 @@ class Gemini:
 
         response = self.client.models.generate_content(
                 model= self.model,
-                content = content)
+                contents = contents)
             
         generated_response = response.text
 

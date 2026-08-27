@@ -52,8 +52,15 @@ def ask_for_behaviour_dimensions(rubric=BEHAVIOUR_CATEGORY_RUBRIC):
 def ask_for_text_input():
     '''
     Interactive helper that asks the user which text to analyse.
-    Returns the action log to be inputted into te behavioural analysis function
+    Returns the action log to be inputted into the behavioural analysis function
     '''
     user_reply = input('\nEnter your text input to be analysed (enter as one line): ')
     action_log = text_to_action_log(user_reply)
     return action_log
+
+
+#def ask_for_video_upload():
+    '''
+    Interactive helper that asks the user to upload or enter the URL for a video analysis
+    '''
+    user_reply = 

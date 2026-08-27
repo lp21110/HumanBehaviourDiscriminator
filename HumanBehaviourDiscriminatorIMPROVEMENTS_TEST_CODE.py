@@ -505,17 +505,17 @@ if __name__ == "__main__": #only runs if this script is directly run instead of 
     # print('RESULT 1', json.dumps(result_1, indent=2))   # pretty-print if it parsed to a dict
 
     #test_transcript_2 = """
-    # [07:42:13] Agent walks into kitchen, flicks light switch, light doesn't come on, flicks it again.
-    # [07:42:20] Agent fills kettle, slightly overfills, tips a bit back out into sink.
-    # [07:42:34] Agent sets kettle to boil, leans against counter.
-    # [07:42:51] Agent opens cupboard, looks for mug, moves two mugs aside, picks the one at the back.
-    # [07:43:10] Agent gets distracted by phone, scrolls for about 40 seconds.
-    # [07:43:55] Agent looks up as kettle clicks off, realises it boiled a while ago.
-    # [07:44:02] Agent drops teabag in mug, pours water, splashes slightly.
-    # [07:44:20] Agent forgets the milk, opens fridge after already pouring, adds it. 
-    # [07:45:30] Agent fishes teabag out, squeezes it against the side, drops it in bin, misses, picks it up.
-    # [07:46:00] Agent sips, it's too hot, sets it down, waits.
-    # [07:48:30] Agent drinks slowly while staring out the window.
+    [07:42:13] Agent walks into kitchen, flicks light switch, light doesn't come on, flicks it again.
+    [07:42:20] Agent fills kettle, slightly overfills, tips a bit back out into sink.
+    [07:42:34] Agent sets kettle to boil, leans against counter.
+    [07:42:51] Agent opens cupboard, looks for mug, moves two mugs aside, picks the one at the back.
+    [07:43:10] Agent gets distracted by phone, scrolls for about 40 seconds.
+    [07:43:55] Agent looks up as kettle clicks off, realises it boiled a while ago.
+    [07:44:02] Agent drops teabag in mug, pours water, splashes slightly.
+    [07:44:20] Agent forgets the milk, opens fridge after already pouring, adds it. 
+    [07:45:30] Agent fishes teabag out, squeezes it against the side, drops it in bin, misses, picks it up.
+    [07:46:00] Agent sips, it's too hot, sets it down, waits.
+    [07:48:30] Agent drinks slowly while staring out the window.
     # """
 
     # result_2 = get_behaviour_analysis(text_input=test_transcript_2, user_dimension_reply="PROVIDED_PROMPT: ALL_PROMPTS", rubric=BEHAVIOUR_CATEGORY_RUBRIC)
