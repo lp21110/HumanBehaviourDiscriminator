@@ -6,6 +6,7 @@ from human_behaviour_discriminator.get_behaviour_analysis import (
 from human_behaviour_discriminator.text_to_actionlog import text_to_action_log
 from human_behaviour_discriminator.model_provider import ModelProviderError
 from human_behaviour_discriminator.chunked_analysis import analyse_large_behaviour_text
+from human_behaviour_discriminator.video_analysis import video_to_action_log
 
 
 DIMENSION_NAMES = list(BEHAVIOUR_CATEGORY_RUBRIC) #the default rubric to use for analysis
@@ -156,26 +157,103 @@ def analyse_behaviour(behaviour_text, selected_dimensions, custom_prompt, progre
     return summary, action_log, _category_rows(analysis), analysis
 
 
+def analyse_video(video_input, video_input_type, selected_dimensions, custom_prompt, progress=gr.Progress()):
+    '''
+    Input: the video input/ uploaded by user on interface
+    Output: behaviour text. To be inputted into analyse_behaviour function above.
+    '''
+    #if no file or URL has been uploaded
+
+
+    #check selected prompts 
+    try:
+        dimensions_of_interest, rubric = _selected_rubric(selected_dimensions, custom_prompt) 
+    except ValueError as exc: #convert error into an error pop-up 
+        raise gr.Error(str(exc)) from exc #uses the original error message to explain Error raised
+    
+    progress(0.1, desc="Converting the video inputted into an action log") #dsiplays on screen current step of converting input text to an action log 
+
+    #1. convert to behaviour text
+    video_action_log = video_to_action_log(video_input_type, video_input) #convert input to action log 
+
+
+    #run analysis on the generated captions/ action logs
+    progress(0.45, desc="Scoring the selected behaviour dimensions") #displays on screen current stage of scoring the dimensions - call get_behaviour_analysis
+
+    #action_log_size = len(json.dumps(video_action_log))
+    #if action_log_size > DEFAULT_ACTION_LOG_CHUNK_CHARS:
+
+    try:
+        analysis = get_behaviour_analysis(text_input=video_action_log, rubric=rubric, dimensions_of_interest=dimensions_of_interest)
+    except ModelProviderError as exc:
+        raise gr.Error(
+            f"The configured model provider could not complete the analysis: {exc}"
+        ) from exc
+    except Exception as exc: #error message 
+        raise gr.Error(
+            f"The behaviour analysis failed. Check the configured model provider. "
+            f"Details: {exc}"
+        ) from exc
+
+    progress(0.95, desc="Preparing results")
+    percentage = analysis.get("overall_human_likeness_percentage", "Not provided")
+    classification = analysis.get("classification", "Not provided")
+    model_summary = analysis.get("classification_summary", "No summary was returned.")
+    percentage_display = f"{percentage}%" if isinstance(percentage, (int, float)) else percentage
+    summary = (
+        "## Analysis result\n"
+        f"**Classification:** {classification}  \n"
+        f"**Human-likeness:** {percentage_display}  \n\n"
+        f"{model_summary}"
+    )
+
+    return summary, video_action_log, _category_rows(analysis), analysis
+
+#wrapper functions for uploaded videos and video urls:
+def analyse_uploaded_video(video, dimensions, custom_prompt, progress=gr.Progress()):
+    return analyse_video(video, "file_upload", dimensions, custom_prompt, progress)
+
+def analyse_video_url(url, dimensions, custom_prompt, progress=gr.Progress()):
+    return analyse_video(url, "url", dimensions, custom_prompt, progress)
+
+
+
 def build_app():
 
     """Create the Gradio application without launching its web server."""
 
     with gr.Blocks(title="Human Behaviour Discriminator") as app:
+
         gr.Markdown(
             "# Human Behaviour Discriminator\n"
-            "Enter an action description, choose the dimensions to assess, and press Run Analysis for results.")
+            "Input an action sequence or a video, choose the dimensions to assess, and press Run Analysis for results.")
 
         with gr.Row():
+            
             with gr.Column(scale=3):
-                behaviour_text = gr.Textbox(
-                    label="Behaviour description or transcript",
-                    placeholder=(
-                        "Example: [07:42:13] Agent enters the kitchen and tries the "
-                        "light switch twice..."),
-                    lines=14,
-                    )
+                with gr.Blocks():
+
+                    with gr.Tab("Analyse a Video"):
+
+                        with gr.Tab("Upload a video file"):
+                            video_file_upload = gr.Video()
+                            analyse_video_file_button = gr.Button("Run analysis")
+                        with gr.Tab("Input Video URL"):
+                            video_url = gr.Textbox(label='Video URL')
+                            analyse_video_url_button = gr.Button("Run analysis")
+
+                    with gr.Tab("Analyse Text"):
+                        behaviour_text = gr.Textbox(
+                            label="Behaviour description or transcript",
+                            placeholder=(
+                                "Example: [07:42:13] Agent enters the kitchen and tries the "
+                                "light switch twice..."),
+                            lines=14,
+                        )
+                        analyse_text_button = gr.Button("Run analysis")
+                    
                 custom_prompt = gr.Textbox(
-                    label="Optional custom assessment prompt",
+                    label="Optional custom prompts",
                     placeholder="Example: Does the agent show fatigue?",
                     lines=2,
                     )
@@ -187,13 +265,8 @@ def build_app():
                     label="Behaviour dimensions",
                     info="All dimensions are selected by default.",
                 )
-                analyse_button = gr.Button("Run analysis", variant="primary")
-                clear_button = gr.ClearButton(
-                    value="Clear",
-                    components=[behaviour_text, dimensions, custom_prompt],
-                )
 
-        summary_output = gr.Markdown("Run an analysis to see the result.")
+        summary_output = gr.Markdown("Run analysis to see the result.")
 
         with gr.Tabs():
             with gr.Tab("Category results"):
@@ -216,9 +289,28 @@ def build_app():
             with gr.Tab("Full JSON"):
                 analysis_output = gr.JSON(label="Complete analysis response")
 
-        analyse_button.click(
+        analyse_text_button.click(
             fn=analyse_behaviour,
             inputs=[behaviour_text, dimensions, custom_prompt],
+            outputs=[
+                summary_output,
+                action_log_output,
+                category_output,
+                analysis_output,],
+        )
+        analyse_video_file_button.click(
+            fn=analyse_uploaded_video,
+            inputs=[video_file_upload, dimensions, custom_prompt],
+            outputs=[
+                summary_output,
+                action_log_output,
+                category_output,
+                analysis_output,],
+        )
+
+        analyse_video_url_button.click(
+            fn=analyse_video_url,
+            inputs=[video_url, dimensions, custom_prompt],
             outputs=[
                 summary_output,
                 action_log_output,
