@@ -59,8 +59,3 @@ def ask_for_text_input():
     return action_log
 
 
-#def ask_for_video_upload():
-    '''
-    Interactive helper that asks the user to upload or enter the URL for a video analysis
-    '''
-    user_reply = 

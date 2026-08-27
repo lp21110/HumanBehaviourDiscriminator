@@ -7,6 +7,7 @@ import os
 from functools import lru_cache
 from typing import Any
 
+#FOR TEXT ANALYSIS - TEXTS DIRECTLY INPUTTED, OR CAPTIONS OF INPUTTED VIDEOS --------------------------------------------------------------
 
 #ERROR FOR MODEL OUTPUTS IF NOT IN/ CANNOT BE CONVERTED TO A JSON FORMAT 
 class ModelProviderError(RuntimeError): 
@@ -113,13 +114,13 @@ class PrivateAPI:
         from openai import OpenAI
 
 
-        base_url = os.getenv("HBD_API_BASE_URL","https://agx1-1.taildbf607.ts.net/v1",)
-        api_key = os.getenv("HBD_API_KEY","1237899") #get the API key from $env:HBD_API_KEY
+        base_url = os.getenv("HBD_API_BASE_URL","https://agx1-1.taildbf607.ts.net/v1",) #PRIVATE API base URL set to the one provided 
+        api_key = os.getenv("HBD_API_KEY") #get the API key from $env:HBD_API_KEY
 
         default_model = "jetson/qwen3.5-9b-q8_0" #here can alter the defaut model
-        self.model = os.getenv("HBD_API_MODEL", default_model,) #access the model specific in environment to run, if none specified run default model
+        self.model = os.getenv("HBD_API_MODEL", default_model) #access the model specific in environment to run, if none specified run default model
 
-        self.client = OpenAI(api_key = api_key, base_url = base_url,)
+        self.client = OpenAI(api_key = api_key, base_url = base_url)
 
     def generate_json(self, system_prompt: str, user_prompt: str) -> dict[str, Any]:
         
@@ -173,7 +174,15 @@ import base64
 class Gemini:
     """
     Analyse and create an action log via Gemini API model gateway 
+
+    Default model : gemini-3.7-flash
+    Issues with model choice: Frequently becomes too 'high demand' when used in Free Tier. Can replace with previous models:
+            'gemini-3.6-flash'
+            'gemini-3.5-flash'
+            'gemini-3.5-flash-lite'
+            But, might loose accuracy quality in video captioning.
     """
+
     name = "Gemini"
 
     def __init__(self):
@@ -187,10 +196,10 @@ class Gemini:
             )
 
         self.client = genai.Client(api_key=api_key)
-        self.model = "gemini-3.6-flash"
+        self.model = "gemini-3.7-flash"
         self.time = time
 
-    def generate_json(self, video_input_type : str, video_input, system_prompt: str) -> dict[str, Any]:
+    def generate_json(self, video_input_type : str, video_input, system_prompt: str) -> str:
 
         if video_input_type == "file_upload":
             myfile = self.client.files.upload(file=video_input)
@@ -214,15 +223,82 @@ class Gemini:
 
         return generated_response
     
-    #Using Gemini API - youtube URL's
 
+class Qwen:
+    """
+    Suggested to be more accurate at identifying human actions from a video. 
+    Requirements: To be run locally, requires NVIDIA GPU and CUDA. Hence, run non-locally.
+    Non-local options: (not free)
+        -OpenRouter 
+        -DashScope API Key 
 
-#@lru_cache(maxsize=1)
-def get_model_provider() -> Ollama | PrivateAPI:
+    !!! IF SWITCHING TO QWEN, NEED TO UPDATE/ INCORPORATE INTO video_to_action_log in video_analysis.py 
 
     """
-    Returns and calls/uses the selected backend (either Ollama or Private API).
+    
+    name = "Qwen"
+
+    def __init__(self):
+        from openai import OpenAI
+        import time as time
+
+        base_url = os.getenv("QWEN_API_BASE_URL", "https://openrouter.ai/api/v1") #BASE URL for QWEN (for better video analysis) set to OpenRouter
+        api_key = os.getenv("QWEN_API_KEY")
+
+        if not api_key:
+            raise ModelProviderError(
+                "QWEN_API_KEY is not set. Configure a valid Gemini API key before analysing video.")
+        
+        self.model = "qwen/qwen3.7-flash"
+        self.client = OpenAI(api_key=api_key, base_url=base_url)
+        self.time = time
+        self.base = base64
+
+    def generate_json(self, video_input_type : str, video_input, system_prompt: str) -> str:
+
+        if video_input_type == "file_upload":
+
+            with open(video_input, "rb") as video_file:
+                encoded_video = self.base64.b64encode(video_file.read()).decode("utf-8")
+
+            video_content = {"type": "video_url", "video_url": {"url": f"data:video/mp4;base64,{encoded_video}"}}
+
+        elif video_input_type == "url":
+        
+            video_content = {
+                "type": "video_url",
+                "video_url": {
+                    "url": video_input}
+            }
+         
+        messages = [
+            {"role": "user",
+            "content": [
+                {"type": "text",
+                "text": system_prompt},
+                video_content,
+                ],
+            }
+        ]
+
+        completion = self.client.chat.completions.create(
+            model = self.model,
+            messages = messages,
+            max_tokens = 2048,
+        )
+        return completion.choices[0].message.content
+
+
+#--------------------------------------------------------------------------------------------------------------------------------------
+
+
+def get_model_provider() -> Ollama | Deepseek | PrivateAPI:
+
+    """
+    Returns and calls/uses the selected backend (either Ollama, Deepseek or Private API).
     If neither are chosen, returns an error message.
+
+    Ollama is set as the default.
     """
 
     provider_name = os.getenv("HBD_MODEL_PROVIDER", "ollama").strip().lower() #specify private_api befor calling, or will use ollama provider as default
@@ -236,108 +312,3 @@ def get_model_provider() -> Ollama | PrivateAPI:
     
     raise ModelProviderError("HBD_MODEL_PROVIDER must be 'ollama', 'deepseek' or 'private_api'.")
 
-
-
-# OLD CODE -----------------------------------------------------------------------------------------------------------------------------------
-
-# PRIVATE API CONFIGURATION 
-# class PrivateAPI:
-#     """
-#     Generate JSON through the private API model gateway.
-#     """
-
-#     name = "private API gateway"
-
-#     def __init__(self):
-#         from openai import OpenAI
-
-#         try:
-#             import httpx 
-#         #raise error if the user does not have httpx package installed in terminal
-#         except ImportError as exc:
-#             raise ModelProviderError("The private API provider requires the 'httpx' package.") from exc
-
-
-#         #base_url = os.getenv("HBD_API_BASE_URL", "").rstrip("/") #use this line if you want to implement another private API/ input API environment in terminal instead of the specific gateway used in this case
-#         base_url = "https://agx1-1.taildbf607.ts.net/v1"
-#         #models = os.getenv("HBD_API_MODEL", "") #provide the model in gitbash/ terminal under $env:HBD_API_MODEL - use to be able to implement another API 
-#         models = "/models" #access the different models the API can run
-#         default_model = "jetson/qwen3.5-9b-q8_0" #here can alter the defaut model
-        
-#         #USE BELOW CODE IF ENTERING THE BASE_URL AND THE API_MODEL VIA TERMINAL (INSTEAD OF THE ONE SET HERE)
-#         #if not base_url: #raise error if the base_url is not provided under $HBD_API_BASE_URL
-#         #    raise ModelProviderError("HBD_API_BASE_URL is required for private_api.")
-#         #if not model: #raise error if the API model is not provided under $env:HBD_API_MODEL
-#         #    raise ModelProviderError("HBD_API_MODEL is required for private_api.")
-
-#         #endpoint = os.getenv("HBD_API_ENDPOINT", "/v1/generate") #uses the provided HBD_API_ENDPOINT variable if provided in terminal, otherwise uses provided endpoint 
-#         #endpoint = os.getenv(endpoint_get_url)
-#         #self.url = f"{base_url}/{endpoint.lstrip('/')}" #append endpoint to the base URL and define as the URL for the API / model to use
-        
-
-#         endpoint_get_url = f"{base_url}/{models.lstrip('/')}/{default_model.lstrip('/')}" 
-        
-#         self.url = endpoint_get_url
-#         self.model = default_model 
-
-#         #headers = {"Accept": "application/json"} IDK WHAT THIS CODE DOES
-#         api_key = os.getenv("HBD_API_KEY") #get the API key from $env:HBD_API_KEY
-
-#         #IDK WHAT THE BELOW LINES DO 
-#         # if api_key:
-#         #     header_name = os.getenv("HBD_API_AUTH_HEADER", "Authorization")
-#         #     auth_scheme = os.getenv("HBD_API_AUTH_SCHEME", "Bearer")
-#         #     headers[header_name] = f"{auth_scheme} {api_key}".strip()
-
-#         timeout = float(os.getenv("HBD_API_TIMEOUT", "120")) #limit the amount of time allowed for this function to run 
-
-#         self.client = OpenAI(api_key = api_key, base_url = base_url,)
-
-
-
-#     def generate_json(self, system_prompt: str, user_prompt: str) -> dict[str, Any]:
-#         #generate json function that is specific to the Private API model output
-#         payload = {
-#             "model": self.model,
-#             "system_prompt": system_prompt,
-#             "prompt": user_prompt,
-#             #"temperature": 0, - default/ recommended is set to 0.2 already
-#             "response_format": "json",
-#         }
-
-#         #THE DIFFERENT WAYS TO CALL FOR THE RESONSE FROM THE API - MAKE IT SPECIFIC TO THE WHAT THE API YOU HAVE REQUIRES 
-#         try:
-#             response = client.chat.completions.create(self.url, json=payload)
-#             response.raise_for_status()
-#         except Exception as exc:
-#             status_code = getattr(getattr(exc, "response", None), "status_code", None)
-#             status_text = f" (HTTP {status_code})" if status_code else ""
-#             raise ModelProviderError(f"The private API gateway request failed{status_text}.") from exc
-
-#         #TRIES TO EXTRACT THE RESPONSE AS A JSON (AS THE SYSTEM / USER PROMPT REQUESTED)
-#         try:
-#             gateway_response = response.json()
-#         except ValueError as exc:
-#             raise ModelProviderError("The private API gateway did not return JSON.") from exc
-
-#         if "response" not in gateway_response:
-#             raise ModelProviderError("The private API gateway response has no 'response' field.")
-
-#         generated_content = gateway_response["response"]
-#         return _decode_json_object(generated_content)
-
-
-
-# @lru_cache(maxsize=1)
-# def get_model_provider() -> OllamaProvider | PrivateAPIProvider:
-#     """Return the selected backend and reuse it for the whole pipeline."""
-#     provider_name = os.getenv("HBD_MODEL_PROVIDER", "ollama").strip().lower()
-
-#     if provider_name == "ollama":
-#         return OllamaProvider()
-#     if provider_name == "private_api":
-#         return PrivateAPIProvider()
-
-#     raise ModelProviderError(
-#         "HBD_MODEL_PROVIDER must be 'ollama' or 'private_api'."
-#     )

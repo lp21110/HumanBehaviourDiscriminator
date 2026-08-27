@@ -3,7 +3,8 @@ BEHAVIOUR_DIMENSION_SUMMARIES = {
     'HUMAN_IMPERFECTIONS': 'Assesses hesitation, forgetfulness, distraction, interruptions, and other imperfect human-like action flow.',
     'RECOVERY': 'Assesses mistake detection, correction, self-checking, and whether recovery looks natural or overly convenient.',
     'PREFERENCES_AND_NON_OPTIMALITY': 'Assesses preference-driven choices, adequate rather than optimal actions, and small routine variations.',
-    'MICRO-BEHAVIOUR': 'Assesses automatic or subconscious behaviours with no outward task goal, such as fidgeting or yawning.',
+    'TIMING' : 'Assesses realism of the timing for each action, and between each action',
+    'MICRO-BEHAVIOUR' : 'Assesses automatic or subconscious behaviours with no outward task goal, such as fidgeting or yawning.',
     'ENVIRONMENTAL_CONTEXT': 'Assesses whether actions respond to objects, surroundings, and environmental constraints.',
     'PHYSIOLOGICAL_CONTEXT': 'Assesses whether actions are physically plausible and reflect realistic bodily constraints.',
     'ATTENTIVENESS': 'Assesses monitoring, attention shifts, selective awareness, and whether some information is overlooked.',
@@ -29,7 +30,7 @@ BEHAVIOUR_CATEGORY_RUBRIC = {
         'Does the agent show evidence of adjusting its behaviour in response to external feedback?',
         'Does the agent revise its goals when encountering events that hinder its inferred task from its action sequence?',
         'Does the agent show evidence of flexibility in their behaviour, such as being able to switch between different strategies or approaches to achieve their goals?',
-        #'Does the agent show evidence of improvisation or creativity in their actions?',   - similar to the above prompt              
+        #'Does the agent show evidence of improvisation or creativity in their actions?', - similar to the above prompt              
 		'Does the agent show evidence of re-planning or updating their plans as they happen?'
      ],
 
@@ -67,8 +68,8 @@ BEHAVIOUR_CATEGORY_RUBRIC = {
     ##], #remove prompt - example model response is: 'agents behaviour shows some emotional action such as adding milk and removing the teabag
 
 
-    #NON-OPTIMALITY 
-    'PREFERENCES_AND_NON_OPTIMALITY' : [ #deviation from a clean task flow
+    #NON-OPTIMALITY - not following a completely clean task flow as typical generative agents
+    'PREFERENCES_AND_NON_OPTIMALITY' : [ 
         'Does the agents behaviour suggest preference-driven choices over optimal actions?',
         'Does the agent behaviour display sub-optimal behaviour?', 
         'Does the agents behaviour show signs of settling for adequate rather than optimal action flows?',
@@ -76,20 +77,22 @@ BEHAVIOUR_CATEGORY_RUBRIC = {
     ],
     
     #TIMING
-    # 'TIMING' : [
-    #     'Do the time intervals between each action/ different actions or task sequences performed show realistic variation? ',
-    #     'Do the intervals between consecutive actions show human-like irregularity, including natural pauses, quicker automatic movements, and longer gaps before complex or context-dependent actions?',
-    #     'Do the times taken for each action correspond with the time generally required for the actions?',
-    #     'Are the times taken to perform tasks realistic rather than optimally efficient?'
-    # ],
+    'TIMING' : [
+        'Are the time intervals between each action realistic?',
+        'Do the time intervals between each action/ different actions or task sequences performed show realistic variation?',
+        'Do the intervals between consecutive actions show human-like irregularity, including natural pauses, quicker automatic movements, and longer gaps before complex or context-dependent actions?',
+        'Do the times taken for each action correspond with the time those actions would normally take?',
+        'Are the times taken to perform tasks realistic, rather than too fast, or too slow?'
+    ],
 
     #MICRO-BEHAVIOURS
-    #'MICRO-BEHAVIOUR' : [
-    #    'Does the agents behaviour perform any automatic, subconscious or micro-behaviours, behaviours with no outward goal? These are behaviours such as yawning, stretching, fidgeting, sighing, flinching, startling, hiccups etc.',
-    #],
+    'MICRO-BEHAVIOUR' : [
+        'Does the agents behaviour perform any automatic, subconscious or micro-behaviours, behaviours with no outward goal? These are behaviours such as yawning, stretching, fidgeting, sighing, flinching, startling, hiccups etc.',
+    ],
 
     #ENVIRONMENTAL CONTEXTUAL BEHAVIOUR
     'ENVIRONMENTAL_CONTEXT' : [
+        'Does the human act in co-ordination with their environment?'
 	    'Do the actions of the human adapt to the locations of the objects they are interacting with?',
 	    'Do the agents actions show an awareness of their environmental constraints, surrounding wise?', #i.e. physically, walking around obstacles, repositioning objects, adjusting grip, changing posture
 	    'Do the actions of the human show that they have been influenced by their surrounding environment?'

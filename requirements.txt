@@ -1,0 +1,27 @@
+# Core application interface
+
+gradio==6.26.0
+
+# Text-analysis providers
+# Ollama is the default provider. 
+# Openai is used for the private-API and DeepSeek providers, and can also be used for the remote Qwen/OpenRouter video-captioning option.
+
+ollama==0.6.2
+openai==3.3.1
+
+# Gemini - video-captioning provider
+
+google-genai==2.20.0
+
+# If replacing gemini with Qwen-VL video model, install these separately:
+
+# accelerate==1.14.0
+# av==18.1.0
+# pillow==12.3.0
+# qwen-vl-utils==0.0.14
+# torch==2.13.0
+# torchvision==0.28.0
+# transformers==5.16.1
+
+# For the testing files not involved in the UI pipeline (NPZ conversion/cleaning scripts):
+# numpy==2.5.2

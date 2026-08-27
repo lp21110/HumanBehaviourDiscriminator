@@ -35,9 +35,8 @@ def get_behaviour_analysis(text_input, rubric=BEHAVIOUR_CATEGORY_RUBRIC, user_di
 
     #Define the prompt for the behavior discriminator
     #the initial messages to set the context for the behaviour discriminator. 
-        #Modify the 'system' role to include specific instructions or examples for the behaviour of the discriminator to follow when analyzing the behaviour transcript.
-        #Modify the 'user'role by appending the text input (the behaviour transcript) to the messages list. The text input should be a description of the agents actions 
-        #and movements expected in natural language format.
+        #'system' role - specific instructions or examples for the behaviour of the discriminator to follow when analyzing the behaviour transcript.
+        #'user'role - Append the text input (the behaviour transcript) to the messages list. The text input should be the description of the agents actions and movements expected in natural language format.
 
     system_prompt = "You are a behaviour discriminator. Your role is to analyse behaviour using a provided behaviour rubric, and score how human-like the agents actions are on a scale from 0 to 10, where 0=generated-like and 10=clearly human-like."
     

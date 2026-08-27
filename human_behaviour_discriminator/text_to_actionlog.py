@@ -45,9 +45,8 @@ def text_to_action_log(text_input):
         user_prompt=prompt,
     )
 
-    #if "action_log" not in response or not isinstance(response["action_log"], list):
-    #    raise ValueError("The model response did not contain an action_log list.")
+    if "action_log" not in response or not isinstance(response["action_log"], list):
+        raise ValueError("The model response did not contain an action_log list.")
 
-    #return response["action_log"]
+    return response["action_log"]
 
-    return response 
