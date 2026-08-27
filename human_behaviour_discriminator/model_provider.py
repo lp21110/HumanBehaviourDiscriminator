@@ -180,7 +180,13 @@ class Gemini:
         from google import genai
         import time as time 
 
-        self.client = genai.Client(api_key="your-API-key-here")
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise ModelProviderError(
+                "GEMINI_API_KEY is not set. Configure a valid Gemini API key before analysing video."
+            )
+
+        self.client = genai.Client(api_key=api_key)
         self.model = "gemini-3.7-flash"
         self.time = time
 
