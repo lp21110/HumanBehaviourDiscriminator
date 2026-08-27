@@ -35,10 +35,11 @@ OpenAI Deepseek model: deepseek-v4-flash
 LLM: Assumed OpenAI model.  
 Personalise by setting the model and base_url environment variables.  
 
-Default model: jetson/qwen3.5-9b-q8_0  
+Default private model: jetson/qwen3.5-9b-q8_0  
 (requires API key)
 
-FOR VIDEO INPUTS (additionally required to one of the above):  
+**Additionally required for Video Analysis:**  
+
 **Gemini**  
 LLM: Gemini  
 Gemini model: gemini-3.7-flash  
