@@ -18,25 +18,25 @@ def video_to_action_log(video_input_type, video_input):
 
     video_analysis_system_prompt = """Carefully watch the given video and identify each distinct action or movement made by the human/character.
 
-Return only one valid JSON object in this format:
-{
-  "action_log": [
-    {
-      "action_step": 1,
-      "start_time": 0,
-      "end_time": 1,
-      "action": "detailed description of the observed action"
+      Return only one valid JSON object in this format:
+      {
+      "action_log": [
+        {
+          "action_step": 1,
+          "start_time": 0,
+          "end_time": 1,
+          "action": "detailed description of the observed action"
+        }
+     ]
     }
-  ]
-}
 
-Use seconds for start_time and end_time. Only include actions literally visible in the video; do not invent events or timings. Be precise and do not omit observed events."""
+    Use mm:ss (minutes:seconds) for recording the start_time and end_time of each action. Only include actions literally visible in the video; do not invent events or timings. Be precise and do not omit observed events."""
 
     vllm_model_provider = Gemini()
 
     response = vllm_model_provider.generate_json(video_input_type, video_input, video_analysis_system_prompt)
 
-    return response["action_log"]
+    return response
 
 
 

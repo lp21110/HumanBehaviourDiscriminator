@@ -17,7 +17,8 @@ def text_to_action_log(text_input):
         
         If text input has explicit timestamps, for each action give its step in the sequence, its timestamp and short description of the action.
         Only include actions that appear in the text, and keep as much of the text_input as possible.
-    
+        
+        timestamps are the times i.e. mm:ss (minute:second) at which the action started (time_start), and at which the action ended (time_end).
         If text input does not have explicit timestamps but does have time cues or duration cues for an action, give its steps in the sequence, the action, the time/ duration cue mentioned in the text, and a short description of the action
 
         If text input does not have any timestamps or time cues or duration cues, give its step in the sequence and a short description of the action.
@@ -29,8 +30,8 @@ def text_to_action_log(text_input):
         Return JSON using these keys: {{
             "action_log" : [ {{
                 "step": 1,
-                "time stamp":"",
-                "time_cue":"",
+                "time_start":"",
+                "time_end":"",
                 "action": ""
                 }} ]
             }}""" 
