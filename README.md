@@ -57,21 +57,21 @@ Setting the environment variables:
 
 **For Deepseek:**  
 1. Set the DeepSeek API key and select the DeepSeek provider.  
-`$env:HBD_MODEL_PROVIDER="deepseek"`  
+`$env:MODEL_PROVIDER="deepseek"`  
 `$env:DEEPSEEK_API_KEY="yourAPIkey"`  
 
-**For Private API:**  
+**For Private:**  
 1. Set the environment variable 'HBD_MODEL_PROVIDER' to "private_api".
 2. IF you wish to connect to a specific API, set the environment variable 'HBD_API_BASE_URL' to your API base URL
 3. Assign the environment variable 'HBD_API_KEY' your API key.  
-`$env:HBD_MODEL_PROVIDER="private_api"`  
-`$env:HBD_API_BASE_URL="yourAPIbaseURL"`      
-`$env:HBD_API_KEY="yourAPIkey"`  
+`$env:MODEL_PROVIDER="private"`  
+`$env:PRIVATE_BASE_URL="yourbaseURL"`      
+`$env:PRIVATE_API_KEY="yourAPIkey"`  
 
-4. (Specific to default private_api) to call a model other than the default model, set the environment variable 'HBD_API_MODEL' to either of the following.    
-`$env:HBD_API_MODEL="jetson/qwen3.5-27b"`  
+4. (Specific to default private_api) To call a model other than the default model, set the environment variable 'HBD_API_MODEL' to either of the following.    
+`$env:PRIVATE_MODEL="jetson/qwen3.5-27b"`  
 OR  
-`$env:HBD_API_MODEL="jetson/qwen3.5-35b"`
+`$env:PRIVATE_MODEL="jetson/qwen3.5-35b"`
 
 
 **For video inputs:**  
