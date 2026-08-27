@@ -23,7 +23,7 @@ def text_to_action_log(text_input):
 
         If text input does not have any timestamps or time cues or duration cues, give its step in the sequence and a short description of the action.
         
-        Only include and analyse what is literally given in the text input, do not make up or invent times, and leave the 'time_stamp / time_cue" response empty.
+        Only include and analyse what is literally given in the text input, do not make up or invent times, and leave the 'time_start / time_end" response empty if not mentioned.
         Text input: {text_input}
 
         
@@ -45,7 +45,9 @@ def text_to_action_log(text_input):
         user_prompt=prompt,
     )
 
-    if "action_log" not in response or not isinstance(response["action_log"], list):
-        raise ValueError("The model response did not contain an action_log list.")
+    #if "action_log" not in response or not isinstance(response["action_log"], list):
+    #    raise ValueError("The model response did not contain an action_log list.")
 
-    return response["action_log"]
+    #return response["action_log"]
+
+    return response 
