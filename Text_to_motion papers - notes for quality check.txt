@@ -1,0 +1,133 @@
+MoMask: Generative Masked Modelling of 3D Human Motions
+
+What is it: framework for text-driven 3D human generation
+
+Typical use of generative transformers for modelling human motions:
+-motions are vector-quantized (they are given an identification vector)
+-they are then inputted into an autoregressive model
+	('autoregressive model' - predicts future/ current values using past values of the same variable)
+-is generated in a unidirectional order (previous tokens determine future tokens)
+	-limiting: motion is generated only by the preceding (rather than global) context
+	-limiting: errors might accumulate over generation process
+
+Hierarchical quantization generative model - 
+
+
+What is the quality of the textual training data that these models have learned from?
+What are the models trained to pick up on/ what have the models been trained to pick up on?
+	How fine-tuned is the model's ability to pick up on human motions - on a scale of large obvious motions to the smallest micro-motions that humans make (i.e. twitching/ rubbing face), to what depth can the model pick up/ identify/ differentiate/ implement behaviours?
+
+
+
+
+SnapMoGen: Human Motion Generation from Expressive Texts
+
+Motion dataset - large-scale dataset with 20K continuous motion capture clips, described by 122K highly expressive text prompts 
+	-'temporally continuous motion capture clips' : tracking and recording movement smoothly without data gaps or frame drops 
+	-'expressive text prompts' : what counts as 'expressive'?
+	Example:
+	
+		
+
+
+
+Established comprehensive benchmarks for this dataset: 
+
+Captures performances from 10 participants, covers range of actions from daily activities, fitness routines, social interactions, dances etc.
+	- Outcome of 20,450 motion clips between 4-12 seconds in length
+	- Each motion clip has 6 different descriptions - 2 manually human-annotated, and 4 LLM-annotated 
+	- Motion coverage is often specific to 'stylized movements' - non-realistic, codified physical actions (doesn’t copy natural behaviour)
+		-'These text instructions and video demonstrations are presented to performers prior to recording sessions as reference material'
+		
+	- Limit: 'Following data collection, motions with notable artifacts (e.g., jittering, foot sliding) are filtered out to maintain data quality' - what are considered as 'artifacts'? These 'artifacts' could be indications of human/ micro-human behaviour
+	- The human motion: skeletal topology comprising 24 joints, and 296-dimensional pose feature (296 distinct scalar values that describe the position, orientation or movement per frame). Combines 3D coordinates across skeletal keypoints, rotations matrices, velocities and bone orientations 
+
+
+
+Towards Human-like Virtual Beings: Simulating Human Behaviour in 3D Scenes
+
+Aim: For agents to be 'holistic goal achievers', and naturally adapt to environmental dynamics to be 'autonomous' agents. Three major barriers:
+	1. Holistic goal achievement: perception to action
+		○ e.g. high level goal: get ready for work. 
+		Now, agent should be able to process perceived current state (i.e. lying on the bed), then compose a series of actions, then the motions for each action (i.e. get up, use toilet, eat breakfast …)
+	2. Environmental Dynamics: be able to actively adjust plans based on their environment
+		○ i.e. If the bathroom is occupied, do other tasks until the bathroom is free. 
+	3. Vast/ Multifaceted human behaviour space : agent has numerous viable paths they can follow to achieve a goal (i.e. if the task is 'get ready for work', agent can shower then eat, or eat then shower) 
+	(i.e. the agent can decide to act based on their requirements/ beliefs/ feelings 
+	e.g. if agent wants to get ready as quickly as possible, eat while the bathroom is occupied
+	However if the agent wants to save energy costs, can wait for shower to become free instead)
+		○ Agent must be able to process priorities and values, and be able to guide its selection of actions accordingly
+
+
+ACTOR: agent introduced in this study, can perform high-level, long-horizon, abstract goals in 3D households guided by 'internal values'.
+'We aim to build humanoid agents that naturally simulate 3D human behaviors to complete daily goals, which can be lengthy, abstract, or ambiguous. Agents receive high-level goal described in language and are tasked with generating plausible motion sequences that align with the given scene.'
+
+	- Operates in 'perceive - plan - act' cycle. Add deliberate goal decomposition and decision-making 
+		○ So still about carrying out a specific action/ completing a specific goal 
+	- BehaviourHub dataset: large-scale human behaviour simulation dataset in scene-aware, complicated tasks
+		○ 'Constructed by exploring LLM commonsense knowledge learned from large corpora, and automatically aligning motion resources with 3D scene' 
+			§ 'LLM commonsense knowledge' : knowledge that are just assumed as basic facts everyone knows (i.e. unwritten facts/ rules/ concepts) that the LLM knows/ can identify/ has learnt
+			§ 'learned from large corpora' :  from the large extensive sources of writing that AI can learn/ pick up patterns from.
+			§ The issues they named in constructing high-quality, human-generated behaviour data:
+				□ Cost 
+				□ Creativity and expertise in designing novel tasks/ creating complete plans from scratch that will be used to annotate large-scale behaviour 
+			§ How this dataset was built: 
+				'Initially, we distill the tree-structured linguistic plans of human daily behaviours from
+				LLM, using in-context learning'
+					Identify the key tree-structures and the linguistic patterns that are associated with daily behaviours that are identified by LLMs: 
+					-They just prompt LLM to generate plans for everyday human activities
+				'Contactable objects and plausible interactions from the scanned 3D scenes and captured motion sequences are attributed into the in-context prompt to ensure viable plans grounding in certain environment.'
+					-In prompts, they include example plans, 3D environmental information about contactable objects that a human could physically touch, plausible interactions from motion data that says which interactions are physically realistic given an environment
+				'Then, we align the task-motion-scene data triplets by applying collision and contact constraints for valid translation and rotation parameters.'
+					-'collision constraints': body is solid and does not collide/ walk through objects/ walls/ other solid objects
+					-'contact constraints': the body actually contacts/ touches objects at the right places when interacting with other objects
+				-'Owing to the automatic data generation pipeline, our dataset achieves even higher diversity and coverage with low human cost.'
+				('tree-structured': how there is an overall goal (i.e. prepare brekkie), then smaller goals to achieve that, and smaller to achieve those etc etc) 
+		- LLM IS USED AS PLANNER: WHAT IS THE LLM TRAINED ON
+		
+		-Generated dataset Limitations: 
+			- 'The generated data is often blamed for low quality and diversity issues. The 3D environment-aware nature of the task also poses unique challenges. To respond, we explore attributed prompts specifically conditioned on the environment…' 
+				- so behaviour data used are specific to the particular environments that are chosen to be used in prompts - this is done to increase quality, but does it increase diversity?
+				
+				Environment used: '3d textured meshes that span a house of multiple functional areas', objects (i.e. bed, fridge) are embedded in their respective environments
+			- 'For the executable actions, it provides descriptions of motion sequences. In the case of high-level activity, it bypasses the action stage and proceeds to break down the target further'  - Based on the agent purely performing and completing specific actions 
+			- 'we build a large repository of common behaviours performed in daily household scenarios' 
+			
+Human Motion Datasets used: 
+	- AMASS 
+	- BABEL 
+	- GRAB 
+	All three datasets have real optical motion-capture data of humans recorded in a lab - performed actions where actors were instructed to do specific tasks/ movements in a controlled setting. SO, naturalistic and unprompted background idling behaviour is largely absent.
+	(BABEL does contain 'body-part interaction' which are self-contact actions i.e. touching the face, scratching,  and 'body part movements' which are moving specific joints. But these can still register as non-idling behaviour)
+			
+	- Social embodied intelligence, special focus on environment-aware simulation 
+	- LINGUISTIC GOAL-PLAN GENERATION: 
+		- Generate potentially incomplete goal-plan trees
+		- -complete and refine each tree
+		- -filter out ow-quality data 
+		
+	
+		
+			
+				
+				
+				
+	- Gives effective behaviour planning and simulation 
+
+
+DYNAMIC WORLDS, DYNAMIC HUMAMS: GENERATING VIRTUAL HUMAN-SCENE INTERACTION MOTION IN DYNAMIC SCENES
+
+Aim: considers when the environment of the agent is non-static.
+(e.g. a cushion might fall to the ground, table might be moved)
+ 
+Builds in the same method of a 'world model' -  composed of Vision Module, Memory Module, a Controller 
+(World model: AI system that builds an internal simulation of a physical or virtual environment. (predicts how space, time, object interactions and physics change over time in response to interactions.)
+
+Datasets used: 
+	- LINGO 
+	- Trumans 
+'Current datasets are limited to static-scene conditions, which result in a lack of perception and adaption in dynamic scenes, causing unnatural penetrations or failed interactions 
+
+Datasets do not focus on or contain human micro-behaviours
+
+
