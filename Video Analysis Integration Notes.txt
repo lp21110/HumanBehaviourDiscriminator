@@ -1,0 +1,30 @@
+Video Analysis Integration Notes/Plan
+
+Modern VLLM's are limited: Are either focused entirely on the biomechanics of the agent i.e. if the movements of the agent are physically possible, or on the semantics/ reasoning/ logic behind the agent's action sequence/ choice of movements/ actions
+	
+
+So for video discriminator, using two different pipelines: 
+
+	- One that derives the semantic action log, that can then be judged - the VLM 
+		○ Caption the inputted video (create captions that describe the movements and actions of the character in the video)
+		○ Create an action log from these captions
+		○ Input the action log into the discriminator 
+		○ The VLM used: Qwen
+		○ Other VLMS considered: Gemini
+		
+	- One that detects the plausibility of the human movements (whether the motions of the character are physically plausible): - Could then analyse realism of movements i.e. jitters, etc.
+		○  MediaPipe to detects the movements - if accuracy is not enough, can implement 4Dhumans instead
+		○ Use HumanScore to detect and score plausibility of movements detected (HumanScore: Benchmarking Human Motions in Generated Videos)
+
+	- link these together
+	
+
+Quality check: Quality of:
+	- The agents motion/ motion sequence
+	- The quality of the agents movements, and the typical 'human' behaviour that LLM's pick up on (the quality of the motion data that LLMs have been trained on/ exposed to) 
+		○ As most LLM's have been trained with the purpose of a robot in mind - to identify motions/ actions/ movements that lead the human to do a task/ interacting with surrounding objects. Small body movements i.e. random/ awkward shifting/ adjusting position for comfort, touching the face (i.e. due to nervousness), twiddling - random little human movements that a robot would have no use for. LLM's are typically not trained to identify these movements and so might affect Discriminator results.
+		○ Can you make the discriminator pick up/ be able to identify these behaviours? / evaluate the motion sequence for these 
+			§ i.e. if the video input is being converted into an action log, how can you ensure these micro-behaviours are picked up on by the LLM?
+			§ (if the input is already an action log, these little actions are either included in the description or not included. Presumably the LLM won't have an issue with it, but might be worth to double-check how the LLM interprets them? 
+OR if the video input is being directly analysed frame by frame: how is this analysis done, and what format is then fed into the discriminator for it then evaluate?
+
