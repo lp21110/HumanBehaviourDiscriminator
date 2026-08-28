@@ -1,0 +1,33 @@
+Questionnaire Plan:
+
+Question Layout:
+
+For each question:
+	- Provide two sample action logs. One sample is a 'real' action log, and the other is synthesized.
+	- Request the user to choose/ identify which action log they think is the 'real' sample.
+
+From questionnaire results: 
+
+	1. Validating human judgement as an accurate baseline for discriminator performance comparison
+	Find precision with which the human participants identified the real sample in each question; how many participants correctly identified the real sample in the question. (This will tell us whether humans are a reliable baseline judge for being able to differentiate between real and synthetic action log samples. And thus whether they are a good/ valid comparison with which to evaluate the performance of the discriminator.) 
+		○ Find the overall accuracy score of humans as a judge (by combining the accuracy value for all the different questions).
+		○ If the score is above an accuracy threshold, can confirm it as a valid methodology to use as comparison for the discriminator to assess its accuracy. 
+
+	2. Using the questionnaire to improve the discriminator
+	Questionnaire outputs: 
+		- How many participants/ the percentage of human participants that accurately distinguished the real from the synthetic outputs
+			§ Ask the participant what made them choose that sample as real / why the other seemed synthetic. 
+				□ From these identify any repeated ways they were identified. Use these to improve/ refine  the prompts
+	
+				
+	Use the questionnaire outputs to: 
+		- Identify the samples with higher and lower accuracy levels.
+		- Lower accuracy levels: the participants had a harder time differentiating between real and synthetic action log samples
+			§ See how these samples are similar to each other - these similarities could be taken as contributing factors to making the sequence realistic 
+		- Higher accuracy levels: participants easily identified/ distinguished real from fake action sequences
+			§ Identify key differences between these samples - what makes the fake action sequence seem fake/ what makes the real seem more real. 
+			Implement into prompts.
+		- Use the samples from questions with equal votes to analyse why those samples were more difficult to distinguish/ what similarities were there between them that participants used as the judging factor. 
+	
+	3. How to implement these improvements/ changes in the discriminator
+Change/ refine the prompts with any ways/ methods that the participants identified that it was 'human' (as that is what the prompts in the rubric are prompted towards, rather than what identifies it as generated) that haven't already been mentioned in the prompts.
